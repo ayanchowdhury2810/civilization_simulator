@@ -1,7 +1,11 @@
 import { app } from "./app.js";
 import { env } from "./config/env.js";
 import { closeFalkorDB, pingFalkorDB } from "./config/falkordb.js";
-import { ensureWorldSeeded, syncWorldToGraph } from "./modules/world/worldService.js";
+import {
+  ensureWorldSeeded,
+  loadWorldFromGraph,
+  syncWorldToGraph,
+} from "./modules/world/worldService.js";
 import {
   startTickLoop,
   stopTickLoop,
@@ -24,7 +28,12 @@ async function bootstrap(): Promise<void> {
     new Promise<false>((resolve) => setTimeout(() => resolve(false), 3000)),
   ]);
   if (dbUp) {
-    await syncWorldToGraph();
+    const restored = await loadWorldFromGraph();
+    if (restored) {
+      console.log("[world] restored previous world state from FalkorDB");
+    } else {
+      await syncWorldToGraph();
+    }
   } else {
     console.warn(
       `[startup] FalkorDB unreachable at ${env.FALKORDB_HOST}:${env.FALKORDB_PORT} — running in memory only`,

@@ -22,7 +22,7 @@ export function seedWorld(state: WorldState): void {
     const citizen = state.addCitizen({
       name: CITIZEN_NAMES[index % CITIZEN_NAMES.length],
       job,
-      hunger: 55 + Math.round(Math.random() * 30),
+      foodLevel: 55 + Math.round(Math.random() * 30),
       money: 20 + Math.round(Math.random() * 40),
       happiness: 60 + Math.round(Math.random() * 30),
     });

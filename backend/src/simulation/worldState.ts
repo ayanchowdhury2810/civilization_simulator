@@ -13,12 +13,25 @@ import type {
   Citizen,
   Job,
   MarketState,
+  PersistedWorld,
   Policy,
   SimEvent,
   Trade,
   WorldResources,
 } from "./types.js";
 import { inferCause } from "./eventGraph.js";
+
+function maxNumericSuffix(ids: Iterable<string>): number {
+  let max = 0;
+  for (const id of ids) {
+    const match = /_(\d+)$/.exec(id);
+    if (match) {
+      const value = Number(match[1]);
+      if (value > max) max = value;
+    }
+  }
+  return max;
+}
 
 export class WorldState {
   tick = 0;
@@ -39,6 +52,53 @@ export class WorldState {
   private citizenCounter = 0;
   private policyCounter = 0;
 
+  reset(): void {
+    this.tick = 0;
+    this.lastTickAt = null;
+    this.resources = { food: 0, gold: 0, population: 0 };
+    this.market = {
+      foodPrice: BASE_FOOD_PRICE,
+      demand: MARKET_DEMAND_DEFAULT,
+    };
+    this.citizens.clear();
+    this.buildings.clear();
+    this.events = [];
+    this.trades = [];
+    this.policies = [];
+    this.currentPolicy = null;
+    this.buildingCounter = 0;
+    this.citizenCounter = 0;
+    this.policyCounter = 0;
+  }
+
+  restore(data: PersistedWorld): void {
+    this.reset();
+    this.tick = data.tick;
+    this.lastTickAt = data.lastTickAt;
+    this.resources = { ...data.resources };
+    this.market = { ...data.market };
+    for (const building of data.buildings) {
+      this.buildings.set(building.id, building);
+    }
+    for (const citizen of data.citizens) {
+      this.citizens.set(citizen.id, citizen);
+    }
+    this.events = [...data.events];
+    this.trades = [...data.trades];
+    this.policies = [...data.policies];
+    this.resources.population = this.citizens.size;
+    this.currentPolicy =
+      [...this.policies].reverse().find((policy) => policy.status === "pending") ??
+      null;
+    this.recomputeCounters();
+  }
+
+  private recomputeCounters(): void {
+    this.buildingCounter = maxNumericSuffix(this.buildings.keys());
+    this.citizenCounter = maxNumericSuffix(this.citizens.keys());
+    this.policyCounter = maxNumericSuffix(this.policies.map((policy) => policy.id));
+  }
+
   addBuilding(type: BuildingType): Building {
     this.buildingCounter += 1;
     const id = `${type.toLowerCase()}_${this.buildingCounter}`;
@@ -57,7 +117,7 @@ export class WorldState {
 
   addCitizen(
     partial: Pick<Citizen, "name" | "job"> &
-      Partial<Pick<Citizen, "hunger" | "money" | "happiness">>,
+      Partial<Pick<Citizen, "foodLevel" | "money" | "happiness">>,
   ): Citizen {
     this.citizenCounter += 1;
     const id = `citizen_${this.citizenCounter}`;
@@ -65,7 +125,7 @@ export class WorldState {
       id,
       name: partial.name,
       job: partial.job,
-      hunger: partial.hunger ?? 70,
+      foodLevel: partial.foodLevel ?? 70,
       money: partial.money ?? 50,
       happiness: partial.happiness ?? 80,
       currentAction: null,
@@ -183,6 +243,25 @@ export class WorldState {
       if (building.type === type) return building;
     }
     return null;
+  }
+
+  buildingsOfType(type: BuildingType): Building[] {
+    const result: Building[] = [];
+    for (const building of this.buildings.values()) {
+      if (building.type === type) result.push(building);
+    }
+    return result;
+  }
+
+  leastStaffedOfType(type: BuildingType): Building | null {
+    let best: Building | null = null;
+    for (const building of this.buildings.values()) {
+      if (building.type !== type) continue;
+      if (!best || building.workerIds.length < best.workerIds.length) {
+        best = building;
+      }
+    }
+    return best;
   }
 
   countResidents(buildingId: string): number {

@@ -6,6 +6,7 @@ import { Button } from "./ui/button";
 import { CitizenCard } from "./citizen-card";
 import { BuildingCard } from "./building-card";
 import { api } from "@/lib/api";
+import { BUILDING_EMOJI } from "@/lib/labels";
 import type { CitizenDetail, SelectedEntity, WorldSnapshot } from "@/lib/types";
 
 function CitizenDetails({ id, tick }: { id: string; tick: number }) {
@@ -36,11 +37,11 @@ function CitizenDetails({ id, tick }: { id: string; tick: number }) {
     };
   }, [id, tick]);
 
-  if (error) return <p className="text-xs text-rose-300">{error}</p>;
+  if (error) return <p className="text-sm text-rose-500">{error}</p>;
   if (loading && !citizen)
-    return <p className="text-xs text-zinc-500">Loading citizen…</p>;
+    return <p className="text-sm text-slate-400">Loading…</p>;
   if (!citizen)
-    return <p className="text-xs text-zinc-500">Citizen not found.</p>;
+    return <p className="text-sm text-slate-400">Cannot find this person.</p>;
   return <CitizenCard citizen={citizen} />;
 }
 
@@ -60,24 +61,26 @@ export function SelectedEntityPanel({
 
   return (
     <Panel
-      title="Selected Entity"
+      title="Look Closer"
       actions={
         selected ? (
           <Button variant="ghost" onClick={onClear}>
-            Clear
+            Close ✕
           </Button>
         ) : undefined
       }
     >
       {!selected ? (
-        <p className="text-xs text-zinc-500">
-          Nothing selected. Click a citizen or building on the map to inspect it.
+        <p className="text-sm text-slate-400">
+          Tap a person or a building in the town to see what they are doing.
         </p>
       ) : selected.kind === "building" ? (
         building ? (
           <BuildingCard building={building} />
         ) : (
-          <p className="text-xs text-rose-300">Building not found.</p>
+          <p className="text-sm text-rose-500">
+            {BUILDING_EMOJI["House"]} The building is gone.
+          </p>
         )
       ) : (
         <CitizenDetails

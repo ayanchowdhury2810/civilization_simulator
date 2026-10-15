@@ -22,7 +22,7 @@ export async function getCitizenById(id: string): Promise<CitizenDetail> {
     id: String(graphProps.id),
     name: String(graphProps.name),
     job: String(graphProps.job) as Citizen["job"],
-    hunger: Number(graphProps.hunger),
+    foodLevel: Number(graphProps.foodLevel ?? graphProps.hunger),
     money: Number(graphProps.money),
     happiness: Number(graphProps.happiness),
     currentAction: (graphProps.currentAction as Citizen["currentAction"]) ?? null,

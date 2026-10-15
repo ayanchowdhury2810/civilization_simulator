@@ -41,7 +41,7 @@ export interface GraphTradeRow {
 export interface GraphCitizenStats {
   population: number;
   avgHappiness: number;
-  avgHunger: number;
+  avgFoodLevel: number;
 }
 
 export async function fetchWorldNode(): Promise<GraphWorldRow | null> {
@@ -132,7 +132,7 @@ export async function fetchCitizenStats(): Promise<GraphCitizenStats | null> {
   const { rows } = await graphQuery(
     env.FALKORDB_GRAPH,
     `MATCH (c:Citizen)
-     RETURN count(c), avg(c.happiness), avg(c.hunger)`,
+     RETURN count(c), avg(c.happiness), avg(coalesce(c.foodLevel, c.hunger))`,
   );
   if (rows.length === 0) return null;
 
@@ -140,7 +140,7 @@ export async function fetchCitizenStats(): Promise<GraphCitizenStats | null> {
   return {
     population: toNumber(row[0]),
     avgHappiness: toNumber(row[1]),
-    avgHunger: toNumber(row[2]),
+    avgFoodLevel: toNumber(row[2]),
   };
 }
 

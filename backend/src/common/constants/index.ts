@@ -6,7 +6,9 @@ export const HOUSE_CAPACITY = 4;
 
 export const FARM_FOOD_PER_WORKER = 2;
 
-export const CITIZEN_FOOD_PER_TICK = 1;
+export const FOOD_DECAY_PER_TICK = 5;
+export const FOOD_PER_MEAL = 40;
+export const TOWN_TAX_PER_CITIZEN = 1;
 
 export const INITIAL_RESOURCES = {
   food: 100,
@@ -40,9 +42,6 @@ export const PLAYER_ID = "player_1";
 export const MAYOR_LOW_FOOD_PER_CITIZEN = 1.5;
 export const MAYOR_LOW_HAPPINESS = 50;
 export const MAYOR_EVAL_INTERVAL_MS = 120000;
-export const TRADES_PER_MERCHANT_PER_TICK = 1;
-export const TRADE_HUNGER_RESTORE = 20;
-export const TRADE_HAPPINESS_GAIN = 1;
 
 export const CITIZEN_NAMES = [
   "John",

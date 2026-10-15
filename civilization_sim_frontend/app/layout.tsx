@@ -13,9 +13,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "AI Civilization Simulator",
+  title: "My Little Town",
   description:
-    "Watch an AI civilization grow. Approve the mayor, build structures, and query the FalkorDB historian.",
+    "A friendly little town that grows. Help your people by building farms, houses and shops.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

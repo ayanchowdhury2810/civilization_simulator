@@ -17,18 +17,18 @@ export function Panel({
 }) {
   return (
     <section
-      className={`flex min-h-0 flex-col overflow-hidden rounded-xl border border-zinc-800 bg-zinc-900/60 backdrop-blur ${
+      className={`flex min-h-0 flex-col overflow-hidden rounded-3xl border-2 border-sky-100 bg-white shadow-sm ${
         className ?? ""
       }`}
     >
       {title ? (
-        <header className="flex items-center justify-between gap-2 border-b border-zinc-800 px-3 py-2">
+        <header className="flex items-center justify-between gap-2 border-b-2 border-sky-50 px-4 py-2.5">
           <div className="min-w-0">
-            <h2 className="truncate text-xs font-semibold uppercase tracking-wider text-zinc-300">
+            <h2 className="truncate text-base font-extrabold text-slate-700">
               {title}
             </h2>
             {subtitle ? (
-              <p className="truncate text-[11px] text-zinc-500">{subtitle}</p>
+              <p className="truncate text-xs text-slate-400">{subtitle}</p>
             ) : null}
           </div>
           {actions}

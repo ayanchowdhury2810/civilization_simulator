@@ -1,4 +1,5 @@
 import { ConflictError } from "../../error/conflictError.js";
+import { distributeJobWorkers } from "../../simulation/dynamicWorld.js";
 import { worldState } from "../../simulation/worldState.js";
 import type { Building, BuildingType } from "../../simulation/types.js";
 import { persistBuilding } from "./buildingRepository.js";
@@ -21,6 +22,10 @@ export async function build(
 
   worldState.resources.gold -= cost;
   const building = worldState.addBuilding(type);
+
+  if (type === "Farm" || type === "Market") {
+    distributeJobWorkers(worldState);
+  }
 
   worldState.addEvent({
     type: "BuildingBuilt",

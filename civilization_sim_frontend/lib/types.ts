@@ -12,7 +12,7 @@ export interface Citizen {
   id: string;
   name: string;
   job: Job;
-  hunger: number;
+  foodLevel: number;
   money: number;
   happiness: number;
   currentAction: CitizenAction | null;
@@ -123,7 +123,7 @@ export interface ChatContext {
   population: number;
   foodPrice: number;
   demand: number;
-  stats: { population: number; avgHappiness: number; avgHunger: number };
+  stats: { population: number; avgHappiness: number; avgFoodLevel: number };
   events: { id: string; type: string; message: string; tick: number }[];
   causeChains: {
     causeType: string;

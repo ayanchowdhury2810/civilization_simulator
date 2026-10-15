@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { Panel } from "./ui/panel";
-import { eventTone } from "@/lib/format";
+import { eventEmoji, plainMessage } from "@/lib/labels";
 import type { SelectedEntity, SimEvent } from "@/lib/types";
 
 const FILTERS: { label: string; test: RegExp }[] = [
@@ -10,7 +10,7 @@ const FILTERS: { label: string; test: RegExp }[] = [
   { label: "Food", test: /shortage|yield|food|trade|boom/i },
   { label: "Jobs", test: /job|worker|merchant|farmer/i },
   { label: "People", test: /arriv|citizen|sick/i },
-  { label: "Build", test: /built|approved|proposed/i },
+  { label: "Building", test: /built|approved|proposed|created/i },
 ];
 
 export function EventFeed({
@@ -30,8 +30,8 @@ export function EventFeed({
 
   return (
     <Panel
-      title="Event Feed"
-      subtitle={`${filtered.length} events`}
+      title="What's Happening"
+      subtitle="The story of your town"
       actions={
         <div className="flex flex-wrap gap-1">
           {FILTERS.map((item) => (
@@ -39,10 +39,10 @@ export function EventFeed({
               key={item.label}
               type="button"
               onClick={() => setFilter(item.label)}
-              className={`rounded px-1.5 py-0.5 text-[10px] transition-colors ${
+              className={`rounded-full px-2 py-0.5 text-xs font-semibold transition-colors ${
                 filter === item.label
-                  ? "bg-zinc-700 text-zinc-100"
-                  : "text-zinc-500 hover:text-zinc-300"
+                  ? "bg-sky-500 text-white"
+                  : "bg-slate-100 text-slate-500 hover:bg-slate-200"
               }`}
             >
               {item.label}
@@ -51,11 +51,13 @@ export function EventFeed({
         </div>
       }
       bodyClassName="overflow-y-auto"
-      className="max-h-[360px]"
+      className="max-h-[420px]"
     >
-      <ul className="space-y-1">
+      <ul className="space-y-1.5">
         {filtered.length === 0 ? (
-          <li className="text-xs text-zinc-600">No events match this filter.</li>
+          <li className="text-sm text-slate-400">
+            Nothing here yet. Wait and see what happens!
+          </li>
         ) : (
           filtered.slice(0, 60).map((event) => {
             const entity: SelectedEntity = event.citizenId
@@ -69,22 +71,16 @@ export function EventFeed({
                   type="button"
                   disabled={!entity}
                   onClick={() => entity && onSelect(entity)}
-                  className="flex w-full items-start gap-2 rounded-md border border-zinc-800/60 bg-zinc-950/40 px-2 py-1.5 text-left transition-colors enabled:hover:border-zinc-700 disabled:cursor-default"
+                  className="flex w-full items-center gap-2 rounded-xl border border-slate-100 bg-slate-50 px-2.5 py-2 text-left transition-colors enabled:hover:border-sky-200 enabled:hover:bg-sky-50 disabled:cursor-default"
                 >
-                  <span className="mt-0.5 shrink-0 rounded bg-zinc-800 px-1 font-mono text-[10px] text-zinc-400">
-                    {event.tick}
+                  <span className="shrink-0 text-lg">
+                    {eventEmoji(event.type)}
                   </span>
-                  <span className="min-w-0 flex-1">
-                    <span
-                      className={`block text-[11px] font-semibold ${eventTone(
-                        event.type,
-                      )}`}
-                    >
-                      {event.type}
-                    </span>
-                    <span className="block truncate text-[11px] text-zinc-400">
-                      {event.message}
-                    </span>
+                  <span className="min-w-0 flex-1 text-sm font-medium text-slate-700">
+                    {plainMessage(event.message)}
+                  </span>
+                  <span className="shrink-0 rounded-full bg-white px-2 py-0.5 text-xs font-semibold text-slate-400">
+                    Day {event.tick}
                   </span>
                 </button>
               </li>

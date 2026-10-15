@@ -1,80 +1,82 @@
 import { Panel } from "./ui/panel";
 import type { WorldSnapshot } from "@/lib/types";
-import { formatTime } from "@/lib/format";
 
-function Resource({
+function Stat({
+  emoji,
   label,
   value,
-  accent,
+  hint,
+  bg,
 }: {
+  emoji: string;
   label: string;
   value: string;
-  accent: string;
+  hint?: string;
+  bg: string;
 }) {
   return (
-    <div className="rounded-lg border border-zinc-800 bg-zinc-950/60 px-3 py-2">
-      <p className="text-[10px] uppercase tracking-wider text-zinc-500">
-        {label}
-      </p>
-      <p className={`mt-0.5 font-mono text-lg font-semibold ${accent}`}>
-        {value}
-      </p>
+    <div className={`rounded-2xl border-2 ${bg} px-3 py-2`}>
+      <div className="flex items-center gap-2">
+        <span className="text-2xl">{emoji}</span>
+        <div className="min-w-0">
+          <p className="text-xs font-semibold text-slate-500">{label}</p>
+          <p className="text-xl font-extrabold text-slate-800">{value}</p>
+        </div>
+      </div>
+      {hint ? <p className="mt-1 text-xs text-slate-500">{hint}</p> : null}
     </div>
   );
 }
 
 export function ResourcePanel({ world }: { world: WorldSnapshot | null }) {
   const resources = world?.resources;
-  const housing = world
-    ? `${world.resources.population}/${world.housingCapacity}`
-    : "—";
+  const population = resources?.population ?? 0;
+  const capacity = world?.housingCapacity ?? 0;
+  const spaceLeft = Math.max(0, capacity - population);
+
+  const homesHint = world
+    ? spaceLeft > 0
+      ? `Room for ${spaceLeft} more`
+      : "All homes are full!"
+    : undefined;
+
+  const foodHint = resources
+    ? resources.food > 0
+      ? "Yum, there is food!"
+      : "Oh no, no food left!"
+    : undefined;
 
   return (
-    <Panel
-      title="Resources"
-      subtitle={world ? `Tick ${world.tick}` : "awaiting world"}
-      actions={
-        <span className="font-mono text-[10px] text-zinc-500">
-          {formatTime(world?.lastTickAt ?? null)}
-        </span>
-      }
-    >
+    <Panel title="Your Town" subtitle={world ? `Day ${world.tick}` : "Loading…"}>
       <div className="grid grid-cols-2 gap-2">
-        <Resource
+        <Stat
+          emoji="🍎"
           label="Food"
           value={resources ? String(resources.food) : "—"}
-          accent="text-emerald-300"
+          hint={foodHint}
+          bg="border-emerald-100 bg-emerald-50"
         />
-        <Resource
+        <Stat
+          emoji="🪙"
           label="Gold"
           value={resources ? String(resources.gold) : "—"}
-          accent="text-amber-300"
+          hint="Use gold to build"
+          bg="border-amber-100 bg-amber-50"
         />
-        <Resource
-          label="Population"
-          value={resources ? String(resources.population) : "—"}
-          accent="text-sky-300"
+        <Stat
+          emoji="🧑‍🤝‍🧑"
+          label="People"
+          value={resources ? String(population) : "—"}
+          hint="Everyone who lives here"
+          bg="border-sky-100 bg-sky-50"
         />
-        <Resource label="Housing" value={housing} accent="text-indigo-300" />
-      </div>
-
-      <div className="mt-3 flex items-center justify-between rounded-lg border border-zinc-800 bg-zinc-950/60 px-3 py-2">
-        <div>
-          <p className="text-[10px] uppercase tracking-wider text-zinc-500">
-            Food price
-          </p>
-          <p className="font-mono text-sm text-zinc-100">
-            {world ? world.market.foodPrice : "—"} gold
-          </p>
-        </div>
-        <div className="text-right">
-          <p className="text-[10px] uppercase tracking-wider text-zinc-500">
-            Demand
-          </p>
-          <p className="font-mono text-sm text-zinc-100">
-            {world ? Math.round(world.market.demand) : "—"}
-          </p>
-        </div>
+        <Stat
+          emoji="🏠"
+          label="Homes"
+          value={world ? `${population}/${capacity}` : "—"}
+          hint={homesHint}
+          bg="border-indigo-100 bg-indigo-50"
+        />
       </div>
     </Panel>
   );

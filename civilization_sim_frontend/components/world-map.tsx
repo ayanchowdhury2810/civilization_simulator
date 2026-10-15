@@ -1,12 +1,11 @@
 "use client";
 
 import { Panel } from "./ui/panel";
-import type { SelectedEntity, WorldSnapshot } from "@/lib/types";
-import {
-  BUILDING_COLORS,
-  BUILDING_GLYPHS,
-  JOB_DOTS,
-} from "@/lib/format";
+import type { BuildingType, SelectedEntity, WorldSnapshot } from "@/lib/types";
+import { JOB_DOTS } from "@/lib/format";
+import { BUILDING_EMOJI, BUILDING_LABEL } from "@/lib/labels";
+
+const BUILDING_ORDER: BuildingType[] = ["Farm", "House", "Market"];
 
 export function WorldMap({
   world,
@@ -19,23 +18,27 @@ export function WorldMap({
 }) {
   return (
     <Panel
-      title="World Map"
-      subtitle="Click a citizen or building to inspect it"
+      title="The Town"
+      subtitle="Tap a person or a building to learn about it"
       actions={
-        <div className="flex items-center gap-2 text-[10px] text-zinc-500">
+        <div className="hidden items-center gap-3 text-xs font-semibold text-slate-500 sm:flex">
+          {BUILDING_ORDER.map((type) => (
+            <span key={type} className="inline-flex items-center gap-1">
+              <span className="text-base">{BUILDING_EMOJI[type]}</span>
+              {BUILDING_LABEL[type]}
+            </span>
+          ))}
           <span className="inline-flex items-center gap-1">
-            <span className="h-2 w-2 rounded-full bg-emerald-400" /> Citizen
-          </span>
-          <span className="inline-flex items-center gap-1">
-            <span className="h-2 w-2 rounded-sm bg-indigo-400" /> Building
+            <span className="h-2.5 w-2.5 rounded-full bg-sky-400" />
+            Person
           </span>
         </div>
       }
       bodyClassName="p-0"
-      className="min-h-[320px]"
+      className="min-h-[360px]"
     >
-      <div className="relative h-full min-h-[280px] w-full overflow-hidden bg-[radial-gradient(circle_at_30%_20%,rgba(52,211,153,0.08),transparent_55%),radial-gradient(circle_at_75%_70%,rgba(99,102,241,0.10),transparent_55%)]">
-        <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:40px_40px]" />
+      <div className="relative h-full min-h-[320px] w-full overflow-hidden bg-[radial-gradient(circle_at_30%_20%,rgba(16,185,129,0.12),transparent_55%),radial-gradient(circle_at_75%_70%,rgba(56,189,248,0.16),transparent_55%)]">
+        <div className="absolute inset-0 bg-[linear-gradient(rgba(15,23,42,0.04)_1px,transparent_1px),linear-gradient(90deg,rgba(15,23,42,0.04)_1px,transparent_1px)] bg-[size:44px_44px]" />
 
         {world?.buildings.map((building) => {
           const active =
@@ -44,14 +47,16 @@ export function WorldMap({
             <button
               key={building.id}
               type="button"
-              title={`${building.type} ${building.id}`}
+              title={BUILDING_LABEL[building.type]}
               onClick={() => onSelect({ kind: "building", id: building.id })}
-              className={`absolute flex h-6 w-6 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded border text-[10px] font-bold text-zinc-950 transition-transform hover:scale-110 ${
-                BUILDING_COLORS[building.type]
-              } ${active ? "ring-2 ring-amber-300 ring-offset-1 ring-offset-zinc-950" : ""}`}
+              className={`absolute flex h-9 w-9 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-xl border-2 bg-white text-lg shadow-md transition-transform hover:scale-110 ${
+                active
+                  ? "border-amber-400 ring-4 ring-amber-200"
+                  : "border-slate-200"
+              }`}
               style={{ left: `${building.x}%`, top: `${building.y}%` }}
             >
-              {BUILDING_GLYPHS[building.type]}
+              {BUILDING_EMOJI[building.type]}
             </button>
           );
         })}
@@ -63,19 +68,19 @@ export function WorldMap({
             <button
               key={citizen.id}
               type="button"
-              title={`${citizen.name} — ${citizen.job}`}
+              title={citizen.name}
               onClick={() => onSelect({ kind: "citizen", id: citizen.id })}
-              className={`absolute h-3 w-3 -translate-x-1/2 -translate-y-1/2 rounded-full shadow transition-transform hover:scale-150 ${
+              className={`absolute h-3.5 w-3.5 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-white shadow transition-transform hover:scale-150 ${
                 JOB_DOTS[citizen.job]
-              } ${active ? "ring-2 ring-amber-300 ring-offset-1 ring-offset-zinc-950" : ""}`}
+              } ${active ? "ring-4 ring-amber-200" : ""}`}
               style={{ left: `${citizen.x}%`, top: `${citizen.y}%` }}
             />
           );
         })}
 
         {!world ? (
-          <div className="absolute inset-0 flex items-center justify-center text-xs text-zinc-500">
-            Loading world…
+          <div className="absolute inset-0 flex items-center justify-center text-sm font-semibold text-slate-500">
+            Starting your town…
           </div>
         ) : null}
       </div>

@@ -40,7 +40,7 @@ export interface RetrievedContext {
   population: number;
   foodPrice: number;
   demand: number;
-  stats: { population: number; avgHappiness: number; avgHunger: number };
+  stats: { population: number; avgHappiness: number; avgFoodLevel: number };
   events: RetrievedEvent[];
   causeChains: CauseChain[];
   trades: TradeSummary[];
@@ -189,7 +189,7 @@ async function retrieveFromGraph(
     stats: {
       population: stats?.population ?? 0,
       avgHappiness: Math.round(stats?.avgHappiness ?? 0),
-      avgHunger: Math.round(stats?.avgHunger ?? 0),
+      avgFoodLevel: Math.round(stats?.avgFoodLevel ?? 0),
     },
     events: filterEvents(eventList, matchTopics(question)),
     causeChains: chains.map((chain) => ({
@@ -261,20 +261,20 @@ function summarizeCitizens(): RetrievedContext["stats"] {
   const citizens = [...worldState.citizens.values()];
   const population = citizens.length;
   if (population === 0) {
-    return { population, avgHappiness: 0, avgHunger: 0 };
+    return { population, avgHappiness: 0, avgFoodLevel: 0 };
   }
   const happinessTotal = citizens.reduce(
     (total, citizen) => total + citizen.happiness,
     0,
   );
-  const hungerTotal = citizens.reduce(
-    (total, citizen) => total + citizen.hunger,
+  const foodLevelTotal = citizens.reduce(
+    (total, citizen) => total + citizen.foodLevel,
     0,
   );
   return {
     population,
     avgHappiness: Math.round(happinessTotal / population),
-    avgHunger: Math.round(hungerTotal / population),
+    avgFoodLevel: Math.round(foodLevelTotal / population),
   };
 }
 
@@ -312,7 +312,7 @@ function buildContextText(context: RetrievedContext): string {
   );
   lines.push(
     `Citizens: population=${context.stats.population}, ` +
-      `avgHappiness=${context.stats.avgHappiness}, avgHunger=${context.stats.avgHunger}`,
+      `avgHappiness=${context.stats.avgHappiness}, avgFoodLevel=${context.stats.avgFoodLevel}`,
   );
 
   lines.push("Recent key events (newest first):");
@@ -347,7 +347,7 @@ function buildFallbackAnswer(context: RetrievedContext): string {
       `population ${context.population}, food price ${context.foodPrice} (demand ${context.demand}).`,
   );
   lines.push(
-    `Average happiness ${context.stats.avgHappiness}, average hunger ${context.stats.avgHunger}.`,
+    `Average happiness ${context.stats.avgHappiness}, average food level ${context.stats.avgFoodLevel}.`,
   );
 
   if (context.causeChains.length > 0) {

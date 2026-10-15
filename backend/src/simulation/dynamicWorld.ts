@@ -14,9 +14,6 @@ import {
   MAX_FOOD_PRICE,
   MIN_FOOD_PRICE,
   MINOR_EVENT_CHANCE,
-  TRADE_HAPPINESS_GAIN,
-  TRADE_HUNGER_RESTORE,
-  TRADES_PER_MERCHANT_PER_TICK,
 } from "../common/constants/index.js";
 import type { Citizen, Job } from "./types.js";
 import type { WorldState } from "./worldState.js";
@@ -46,16 +43,50 @@ function countJob(state: WorldState, job: Job): number {
 function employForJob(state: WorldState, citizen: Citizen, job: Job): void {
   citizen.job = job;
   if (job === "Farmer") {
-    const farm = state.firstBuildingOfType("Farm");
+    const farm = state.leastStaffedOfType("Farm");
     state.assignWorker(citizen, farm ? farm.id : null);
     return;
   }
   if (job === "Merchant") {
-    const market = state.firstBuildingOfType("Market");
+    const market = state.leastStaffedOfType("Market");
     state.assignWorker(citizen, market ? market.id : null);
     return;
   }
   state.assignWorker(citizen, null);
+}
+
+export function distributeJobWorkers(state: WorldState): void {
+  distributeAcross(state, "Farmer", "Farm");
+  distributeAcross(state, "Merchant", "Market");
+}
+
+function distributeAcross(
+  state: WorldState,
+  job: Job,
+  type: "Farm" | "Market",
+): void {
+  const buildings = state.buildingsOfType(type);
+  if (buildings.length === 0) return;
+
+  const workers: Citizen[] = [];
+  for (const citizen of state.citizens.values()) {
+    if (citizen.job === job) workers.push(citizen);
+  }
+  if (workers.length === 0) return;
+
+  for (const building of buildings) {
+    building.workerIds = building.workerIds.filter((id) => {
+      const citizen = state.citizens.get(id);
+      return citizen ? citizen.job === job : false;
+    });
+  }
+
+  let index = 0;
+  for (const worker of workers) {
+    const building = buildings[index % buildings.length];
+    state.assignWorker(worker, building.id);
+    index += 1;
+  }
 }
 
 export function produceFood(state: WorldState): number {
@@ -103,7 +134,11 @@ export function completePurchase(
 ): Citizen | null {
   const sellers: Citizen[] = [];
   for (const citizen of state.citizens.values()) {
-    if (citizen.job === "Merchant") sellers.push(citizen);
+    if (citizen.job !== "Merchant") continue;
+    const workplace = citizen.worksAtBuildingId
+      ? state.buildings.get(citizen.worksAtBuildingId)
+      : null;
+    if (workplace?.type === "Market") sellers.push(citizen);
   }
 
   if (sellers.length === 0) {
@@ -121,48 +156,6 @@ export function completePurchase(
     tick: state.tick,
   });
   return seller;
-}
-
-export function runTrading(state: WorldState, price: number): number {
-  const market = state.firstBuildingOfType("Market");
-  if (!market) return 0;
-
-  const merchants = [...state.citizens.values()].filter(
-    (citizen) =>
-      citizen.job === "Merchant" && citizen.worksAtBuildingId === market.id,
-  );
-  if (merchants.length === 0) return 0;
-
-  let trades = 0;
-  for (const merchant of merchants) {
-    for (let i = 0; i < TRADES_PER_MERCHANT_PER_TICK; i += 1) {
-      if (state.resources.food <= 0) return trades;
-      const buyer = pickBuyer(state, merchant.id, price);
-      if (!buyer) break;
-
-      buyer.money -= price;
-      merchant.money += price;
-      state.resources.food -= 1;
-      buyer.hunger = clamp(buyer.hunger + TRADE_HUNGER_RESTORE, 0, 100);
-      buyer.happiness = clamp(buyer.happiness + TRADE_HAPPINESS_GAIN, 0, 100);
-
-      state.addTrade({
-        buyerId: buyer.id,
-        sellerId: merchant.id,
-        item: "Food",
-        price,
-        tick: state.tick,
-      });
-      state.addEvent({
-        type: "Trade",
-        message: `${merchant.name} sold food to ${buyer.name} for ${price} gold.`,
-        citizenId: buyer.id,
-        buildingId: market.id,
-      });
-      trades += 1;
-    }
-  }
-  return trades;
 }
 
 export function runArrivals(state: WorldState): number {
@@ -288,21 +281,6 @@ export function runMinorEvents(state: WorldState): string[] {
   }
 
   return effects;
-}
-
-function pickBuyer(
-  state: WorldState,
-  merchantId: string,
-  price: number,
-): Citizen | null {
-  const pool = [...state.citizens.values()].filter(
-    (citizen) =>
-      citizen.id !== merchantId &&
-      citizen.job !== "Merchant" &&
-      citizen.money >= price,
-  );
-  if (pool.length === 0) return null;
-  return randomOf(pool);
 }
 
 function pickSwitchCandidate(state: WorldState, target: Job): Citizen | null {

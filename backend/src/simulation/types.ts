@@ -8,7 +8,7 @@ export interface Citizen {
   id: string;
   name: string;
   job: Job;
-  hunger: number;
+  foodLevel: number;
   money: number;
   happiness: number;
   currentAction: CitizenAction | null;
@@ -96,4 +96,16 @@ export interface WorldSnapshot {
   buildings: Building[];
   recentEvents: SimEvent[];
   recentTrades: Trade[];
+}
+
+export interface PersistedWorld {
+  tick: number;
+  lastTickAt: string | null;
+  resources: WorldResources;
+  market: MarketState;
+  citizens: Citizen[];
+  buildings: Building[];
+  events: SimEvent[];
+  trades: Trade[];
+  policies: Policy[];
 }

@@ -7,10 +7,10 @@ import { HistorianChat } from "./historian-chat";
 import { MayorPanel } from "./mayor-panel";
 import { EventFeed } from "./event-feed";
 import { SelectedEntityPanel } from "./selected-entity-panel";
-import { TimelinePanel } from "./timeline-panel";
 import { Button } from "./ui/button";
 import { api } from "@/lib/api";
 import { useCivilization } from "@/lib/use-civilization";
+import { BUILDING_LABEL } from "@/lib/labels";
 import type { BuildingType, SelectedEntity } from "@/lib/types";
 
 interface Notice {
@@ -19,8 +19,7 @@ interface Notice {
 }
 
 export function Dashboard() {
-  const { world, events, mayor, connected, error, lastUpdated, refresh } =
-    useCivilization();
+  const { world, events, mayor, connected, error, refresh } = useCivilization();
   const [selected, setSelected] = useState<SelectedEntity>(null);
   const [busy, setBusy] = useState<string | null>(null);
   const [notice, setNotice] = useState<Notice | null>(null);
@@ -38,14 +37,14 @@ export function Dashboard() {
         flash({
           tone: "success",
           text: result.building
-            ? `Approved "${result.policy.name}" — built ${result.building.id}.`
-            : `Approved "${result.policy.name}".`,
+            ? `Yay! You built a ${BUILDING_LABEL[result.building.type].toLowerCase()}!`
+            : "Okay! The mayor did it.",
         });
         await refresh();
       } catch (err) {
         flash({
           tone: "error",
-          text: err instanceof Error ? err.message : "Approval failed.",
+          text: err instanceof Error ? err.message : "That did not work.",
         });
       } finally {
         setBusy(null);
@@ -61,14 +60,14 @@ export function Dashboard() {
         const result = await api.build(type);
         flash({
           tone: "success",
-          text: `Built ${result.building.type} (${result.building.id}).`,
+          text: `You built a ${BUILDING_LABEL[result.building.type].toLowerCase()}! 🎉`,
         });
         setSelected({ kind: "building", id: result.building.id });
         await refresh();
       } catch (err) {
         flash({
           tone: "error",
-          text: err instanceof Error ? err.message : "Build failed.",
+          text: err instanceof Error ? err.message : "That did not work.",
         });
       } finally {
         setBusy(null);
@@ -78,42 +77,37 @@ export function Dashboard() {
   );
 
   return (
-    <div className="mx-auto flex w-full max-w-[1600px] flex-col gap-3 p-3 lg:p-4">
-      <header className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-zinc-800 bg-zinc-900/60 px-4 py-3">
+    <div className="mx-auto flex w-full max-w-[1500px] flex-col gap-3 p-3 lg:p-4">
+      <header className="flex flex-wrap items-center justify-between gap-3 rounded-3xl border-2 border-sky-100 bg-white px-4 py-3 shadow-sm">
         <div>
-          <h1 className="text-base font-semibold text-zinc-100">
-            AI Civilization Simulator
+          <h1 className="text-xl font-extrabold text-slate-800">
+            🏰 My Little Town
           </h1>
-          <p className="text-[11px] text-zinc-500">
-            You are the King. Approve the mayor, build, and watch the graph grow.
+          <p className="text-sm text-slate-500">
+            You are the King! Help your people grow and stay happy.
           </p>
         </div>
-        <div className="flex items-center gap-3 text-[11px] text-zinc-400">
-          <span className="inline-flex items-center gap-1.5">
+        <div className="flex items-center gap-3">
+          <span className="inline-flex items-center gap-1.5 text-sm font-semibold text-slate-500">
             <span
-              className={`h-2 w-2 rounded-full ${
-                connected ? "bg-emerald-400" : "bg-rose-500"
+              className={`h-2.5 w-2.5 rounded-full ${
+                connected ? "bg-emerald-400" : "bg-rose-400"
               }`}
             />
-            {connected ? "live" : "offline"}
-          </span>
-          <span className="font-mono">
-            {lastUpdated
-              ? `updated ${new Date(lastUpdated).toLocaleTimeString()}`
-              : "—"}
+            {connected ? "Live" : "Offline"}
           </span>
           <Button variant="ghost" onClick={() => void refresh()}>
-            Refresh
+            Refresh 🔄
           </Button>
         </div>
       </header>
 
       {notice ? (
         <div
-          className={`rounded-lg border px-3 py-2 text-xs ${
+          className={`rounded-2xl border-2 px-3 py-2 text-sm font-semibold ${
             notice.tone === "success"
-              ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-200"
-              : "border-rose-500/30 bg-rose-500/10 text-rose-200"
+              ? "border-emerald-200 bg-emerald-50 text-emerald-700"
+              : "border-rose-200 bg-rose-50 text-rose-600"
           }`}
         >
           {notice.text}
@@ -121,7 +115,7 @@ export function Dashboard() {
       ) : null}
 
       {error ? (
-        <div className="rounded-lg border border-rose-500/30 bg-rose-500/10 px-3 py-2 text-xs text-rose-200">
+        <div className="rounded-2xl border-2 border-rose-200 bg-rose-50 px-3 py-2 text-sm font-semibold text-rose-600">
           {error}
         </div>
       ) : null}
@@ -155,10 +149,6 @@ export function Dashboard() {
             world={world}
             onClear={() => setSelected(null)}
           />
-        </div>
-
-        <div className="lg:col-span-12">
-          <TimelinePanel events={events} />
         </div>
       </div>
     </div>

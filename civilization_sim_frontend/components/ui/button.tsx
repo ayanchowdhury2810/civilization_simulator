@@ -4,13 +4,13 @@ type Variant = "primary" | "secondary" | "ghost" | "danger";
 
 const VARIANTS: Record<Variant, string> = {
   primary:
-    "bg-amber-500 text-zinc-950 hover:bg-amber-400 disabled:bg-zinc-700 disabled:text-zinc-400",
+    "bg-emerald-500 text-white hover:bg-emerald-600 disabled:bg-slate-200 disabled:text-slate-400",
   secondary:
-    "bg-zinc-800 text-zinc-100 hover:bg-zinc-700 disabled:bg-zinc-800/50 disabled:text-zinc-500",
+    "bg-sky-100 text-sky-800 hover:bg-sky-200 disabled:bg-slate-100 disabled:text-slate-400",
   ghost:
-    "bg-transparent text-zinc-300 hover:bg-zinc-800 disabled:text-zinc-600",
+    "bg-transparent text-slate-500 hover:bg-slate-100 disabled:text-slate-300",
   danger:
-    "bg-rose-600 text-white hover:bg-rose-500 disabled:bg-zinc-700 disabled:text-zinc-400",
+    "bg-rose-500 text-white hover:bg-rose-600 disabled:bg-slate-200 disabled:text-slate-400",
 };
 
 export function Button({
@@ -20,7 +20,7 @@ export function Button({
 }: ButtonHTMLAttributes<HTMLButtonElement> & { variant?: Variant }) {
   return (
     <button
-      className={`inline-flex items-center justify-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium transition-colors disabled:cursor-not-allowed ${
+      className={`inline-flex items-center justify-center gap-1.5 rounded-xl px-3 py-2 text-sm font-bold transition-colors disabled:cursor-not-allowed ${
         VARIANTS[variant]
       } ${className ?? ""}`}
       {...props}

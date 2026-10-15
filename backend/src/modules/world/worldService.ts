@@ -3,7 +3,7 @@ import { seedWorld } from "../../simulation/seed.js";
 import { worldState } from "../../simulation/worldState.js";
 import type { WorldSnapshot } from "../../simulation/types.js";
 import { syncUnsyncedEvents } from "../events/eventsRepository.js";
-import { syncWorldState } from "./worldRepository.js";
+import { fetchPersistedWorld, syncWorldState } from "./worldRepository.js";
 
 export function getWorldSnapshot(): WorldSnapshot {
   return {
@@ -44,6 +44,17 @@ export async function trySyncWorld(): Promise<boolean> {
   try {
     await syncWorldState(worldState);
     await syncUnsyncedEvents(worldState);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+export async function loadWorldFromGraph(): Promise<boolean> {
+  try {
+    const persisted = await fetchPersistedWorld();
+    if (!persisted) return false;
+    worldState.restore(persisted);
     return true;
   } catch {
     return false;
