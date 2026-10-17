@@ -1,10 +1,14 @@
 export const BUILDING_TYPES = ["House", "Farm", "Market"] as const;
 
-export const JOBS = ["Farmer", "Merchant", "Builder", "Unemployed"] as const;
+export const JOBS = ["Farmer", "Merchant", "Unemployed"] as const;
 
 export const HOUSE_CAPACITY = 4;
 
 export const FARM_FOOD_PER_WORKER = 2;
+
+export const FARM_WORKER_CAP = 4;
+export const MARKET_WORKER_CAP = 1;
+export const SHOP_FOOD_TAX_RATE = 0.5;
 
 export const FOOD_DECAY_PER_TICK = 5;
 export const FOOD_PER_MEAL = 40;

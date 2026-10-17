@@ -115,6 +115,7 @@ export async function syncWorldState(state: WorldState): Promise<void> {
        SET b.type = $type,
            b.capacity = $capacity,
            b.workerCount = $workerCount,
+           b.food = $food,
            b.x = $x,
            b.y = $y`,
       {
@@ -122,6 +123,7 @@ export async function syncWorldState(state: WorldState): Promise<void> {
         type: building.type,
         capacity: building.capacity,
         workerCount: building.workerIds.length,
+        food: building.food,
         x: building.x,
         y: building.y,
       },
@@ -199,7 +201,7 @@ export async function fetchPersistedWorld(): Promise<PersistedWorld | null> {
     ),
     graphQuery(
       graph,
-      `MATCH (b:Building) RETURN b.id, b.type, b.capacity, b.x, b.y`,
+      `MATCH (b:Building) RETURN b.id, b.type, b.capacity, b.x, b.y, coalesce(b.food, 0)`,
     ),
     graphQuery(
       graph,
@@ -246,6 +248,7 @@ export async function fetchPersistedWorld(): Promise<PersistedWorld | null> {
       capacity: toNumber(row[2]),
       workerIds: [],
       foodPerWorkerTick: type === "Farm" ? FARM_FOOD_PER_WORKER : 0,
+      food: toNumber(row[5]),
       x: toNumber(row[3]),
       y: toNumber(row[4]),
     };
@@ -253,11 +256,16 @@ export async function fetchPersistedWorld(): Promise<PersistedWorld | null> {
   const buildingById = new Map(buildings.map((building) => [building.id, building]));
 
   const citizens: Citizen[] = citizenRows.rows.map((row) => {
-    const worksAtBuildingId = toNullableString(row[10]);
+    const storedJob = toString(row[2], "Unemployed");
+    const job: Job =
+      storedJob === "Farmer" || storedJob === "Merchant"
+        ? storedJob
+        : "Unemployed";
+    const worksAtBuildingId = job === "Unemployed" ? null : toNullableString(row[10]);
     const citizen: Citizen = {
       id: toString(row[0]),
       name: toString(row[1], "Citizen"),
-      job: toString(row[2], "Unemployed") as Job,
+      job,
       foodLevel: toNumber(row[3]),
       money: toNumber(row[4]),
       happiness: toNumber(row[5]),

@@ -3,14 +3,12 @@ import type { BuildingType, Job } from "./types";
 export const JOB_COLORS: Record<Job, string> = {
   Farmer: "text-emerald-400",
   Merchant: "text-amber-400",
-  Builder: "text-sky-400",
   Unemployed: "text-zinc-400",
 };
 
 export const JOB_DOTS: Record<Job, string> = {
   Farmer: "bg-emerald-400",
   Merchant: "bg-amber-400",
-  Builder: "bg-sky-400",
   Unemployed: "bg-zinc-500",
 };
 

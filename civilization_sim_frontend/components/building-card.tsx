@@ -34,16 +34,26 @@ export function BuildingCard({ building }: { building: Building }) {
               <p className="text-xs font-semibold text-[#484d55]">👷 Workers</p>
               <p className="text-lg font-bold">
                 {building.workerIds.length}
+                {building.capacity > 0 ? ` / ${building.capacity}` : ""}
               </p>
             </div>
-            <div className="mc-inset px-3 py-2">
-              <p className="text-xs font-semibold text-[#484d55]">
-                🍎 Food / worker
-              </p>
-              <p className="text-lg font-bold">
-                {building.foodPerWorkerTick}
-              </p>
-            </div>
+            {building.type === "Farm" ? (
+              <div className="mc-inset px-3 py-2">
+                <p className="text-xs font-semibold text-[#484d55]">
+                  🍎 Food / worker
+                </p>
+                <p className="text-lg font-bold">
+                  {building.foodPerWorkerTick}
+                </p>
+              </div>
+            ) : (
+              <div className="mc-inset px-3 py-2">
+                <p className="text-xs font-semibold text-[#484d55]">
+                  🍎 Food in stock
+                </p>
+                <p className="text-lg font-bold">{building.food}</p>
+              </div>
+            )}
           </>
         )}
       </div>

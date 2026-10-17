@@ -1,4 +1,4 @@
-export type Job = "Farmer" | "Merchant" | "Builder" | "Unemployed";
+export type Job = "Farmer" | "Merchant" | "Unemployed";
 
 export type BuildingType = "House" | "Farm" | "Market";
 
@@ -24,6 +24,7 @@ export interface Building {
   capacity: number;
   workerIds: string[];
   foodPerWorkerTick: number;
+  food: number;
   x: number;
   y: number;
 }

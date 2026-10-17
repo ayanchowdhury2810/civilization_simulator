@@ -213,7 +213,7 @@ export function buildTownTextures(scene: Phaser.Scene) {
   buildFarm(scene);
   buildMarket(scene);
   buildShadow(scene);
-  (["Farmer", "Merchant", "Builder", "Unemployed"] as const).forEach((job) =>
+  (["Farmer", "Merchant", "Unemployed"] as const).forEach((job) =>
     buildCitizen(scene, job),
   );
 }

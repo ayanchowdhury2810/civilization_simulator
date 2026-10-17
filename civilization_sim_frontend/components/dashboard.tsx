@@ -77,7 +77,7 @@ export function Dashboard() {
   );
 
   return (
-    <div className="mx-auto flex w-full max-w-[1500px] flex-col gap-3 p-3 lg:p-4">
+    <div className="flex w-full flex-col lg:h-[100dvh]">
       <header className="mc-panel flex flex-wrap items-center justify-between gap-3 px-4 py-3">
         <div>
           <h1 className="text-xl font-bold text-[#16181c]">
@@ -104,7 +104,7 @@ export function Dashboard() {
 
       {notice ? (
         <div
-          className={`border-2 px-3 py-2 text-sm font-bold ${
+          className={`mx-3 mt-3 border-2 px-3 py-2 text-sm font-bold ${
             notice.tone === "success"
               ? "border-[#3f7d2e] bg-[#a7d98f] text-[#12300a]"
               : "border-[#a5382c] bg-[#eaa79e] text-[#3d0f0a]"
@@ -115,23 +115,14 @@ export function Dashboard() {
       ) : null}
 
       {error ? (
-        <div className="border-2 border-[#a5382c] bg-[#eaa79e] px-3 py-2 text-sm font-bold text-[#3d0f0a]">
+        <div className="mx-3 mt-3 border-2 border-[#a5382c] bg-[#eaa79e] px-3 py-2 text-sm font-bold text-[#3d0f0a]">
           {error}
         </div>
       ) : null}
 
-      <div className="grid grid-cols-1 gap-3 lg:grid-cols-12">
-        <div className="lg:col-span-3">
+      <div className="grid min-h-0 flex-1 gap-3 p-3 lg:grid-cols-[300px_minmax(0,1fr)_340px] lg:overflow-hidden">
+        <div className="flex min-h-0 flex-col gap-3 lg:overflow-y-auto">
           <ResourcePanel world={world} />
-        </div>
-        <div className="lg:col-span-6">
-          <WorldMap world={world} selected={selected} onSelect={setSelected} />
-        </div>
-        <div className="lg:col-span-3">
-          <HistorianChat />
-        </div>
-
-        <div className="lg:col-span-4">
           <MayorPanel
             mayor={mayor}
             world={world}
@@ -140,10 +131,14 @@ export function Dashboard() {
             onBuild={handleBuild}
           />
         </div>
-        <div className="lg:col-span-4">
-          <EventFeed events={events} onSelect={setSelected} />
+
+        <div className="flex min-h-0 flex-col">
+          <WorldMap world={world} selected={selected} onSelect={setSelected} />
         </div>
-        <div className="lg:col-span-4">
+
+        <div className="flex min-h-0 flex-col gap-3 lg:overflow-y-auto">
+          <HistorianChat />
+          <EventFeed events={events} onSelect={setSelected} />
           <SelectedEntityPanel
             selected={selected}
             world={world}

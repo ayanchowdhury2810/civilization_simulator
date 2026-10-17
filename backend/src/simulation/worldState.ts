@@ -1,8 +1,11 @@
 import { randomUUID } from "node:crypto";
 import {
   BASE_FOOD_PRICE,
+  FARM_FOOD_PER_WORKER,
+  FARM_WORKER_CAP,
   HOUSE_CAPACITY,
   MARKET_DEMAND_DEFAULT,
+  MARKET_WORKER_CAP,
   MAX_EVENT_FEED,
   MAX_POLICIES,
   MAX_TRADE_LOG,
@@ -105,9 +108,17 @@ export class WorldState {
     const building: Building = {
       id,
       type,
-      capacity: type === "House" ? HOUSE_CAPACITY : 0,
+      capacity:
+        type === "House"
+          ? HOUSE_CAPACITY
+          : type === "Farm"
+            ? FARM_WORKER_CAP
+            : type === "Market"
+              ? MARKET_WORKER_CAP
+              : 0,
       workerIds: [],
-      foodPerWorkerTick: type === "Farm" ? 2 : 0,
+      foodPerWorkerTick: type === "Farm" ? FARM_FOOD_PER_WORKER : 0,
+      food: 0,
       x: 10 + Math.round(Math.random() * 80),
       y: 10 + Math.round(Math.random() * 80),
     };
@@ -257,6 +268,7 @@ export class WorldState {
     let best: Building | null = null;
     for (const building of this.buildings.values()) {
       if (building.type !== type) continue;
+      if (building.capacity > 0 && building.workerIds.length >= building.capacity) continue;
       if (!best || building.workerIds.length < best.workerIds.length) {
         best = building;
       }

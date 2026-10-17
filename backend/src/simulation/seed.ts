@@ -6,7 +6,7 @@ const SEED_JOBS: Job[] = [
   "Farmer",
   "Merchant",
   "Farmer",
-  "Builder",
+  "Unemployed",
   "Unemployed",
   "Farmer",
 ];

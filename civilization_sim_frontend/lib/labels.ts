@@ -3,21 +3,18 @@ import type { BuildingType, CitizenAction, Job, PolicyAction } from "./types";
 export const JOB_EMOJI: Record<Job, string> = {
   Farmer: "🌾",
   Merchant: "🛒",
-  Builder: "🔨",
   Unemployed: "🚶",
 };
 
 export const JOB_LABEL: Record<Job, string> = {
   Farmer: "Farmer",
   Merchant: "Shopkeeper",
-  Builder: "Builder",
   Unemployed: "No job",
 };
 
 export const JOB_HELP: Record<Job, string> = {
   Farmer: "Grows food on the farm",
   Merchant: "Sells food at the shop",
-  Builder: "Ready to build things",
   Unemployed: "Looking for something to do",
 };
 

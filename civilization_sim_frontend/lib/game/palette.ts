@@ -45,7 +45,6 @@ export const COLORS = {
   shirt: {
     Farmer: 0x4caf50,
     Merchant: 0xffb300,
-    Builder: 0x2196f3,
     Unemployed: 0x9e9e9e,
   } as Record<string, number>,
 };

@@ -86,7 +86,7 @@ export function WorldMap({
         </div>
       }
       bodyClassName="p-0"
-      className="min-h-[380px]"
+      className="min-h-[380px] flex-1"
     >
       <div className="relative h-full min-h-[340px] w-full overflow-hidden bg-[#6bb7ff]">
         <div ref={hostRef} className="absolute inset-0" />

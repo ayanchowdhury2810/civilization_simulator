@@ -8,6 +8,7 @@ import {
   completePurchase,
   produceFood,
   runArrivals,
+  runJobSeeking,
   runJobSwitching,
   runMinorEvents,
   updateMarket,
@@ -24,6 +25,7 @@ export const EATING_HAPPINESS_GAIN = 2;
 export interface TickDynamicSummary {
   arrivals: number;
   jobChanges: number;
+  jobSeeking: number;
   trades: number;
   farmYieldEvents: number;
   minorEvents: string[];
@@ -124,6 +126,7 @@ export function runTick(state: WorldState): TickResult {
 
   const arrivals = runArrivals(state);
   const jobChanges = runJobSwitching(state);
+  const jobSeeking = runJobSeeking(state);
   const minorEvents = runMinorEvents(state);
 
   state.resources.population = state.citizens.size;
@@ -136,6 +139,7 @@ export function runTick(state: WorldState): TickResult {
     dynamic: {
       arrivals,
       jobChanges,
+      jobSeeking,
       trades,
       farmYieldEvents,
       minorEvents,

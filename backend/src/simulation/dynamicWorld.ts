@@ -14,11 +14,12 @@ import {
   MAX_FOOD_PRICE,
   MIN_FOOD_PRICE,
   MINOR_EVENT_CHANCE,
+  SHOP_FOOD_TAX_RATE,
 } from "../common/constants/index.js";
-import type { Citizen, Job } from "./types.js";
+import type { Building, Citizen, Job } from "./types.js";
 import type { WorldState } from "./worldState.js";
 
-const ARRIVAL_JOBS: Job[] = ["Farmer", "Merchant", "Builder", "Unemployed"];
+const ARRIVAL_JOBS: Job[] = ["Farmer", "Merchant", "Unemployed"];
 
 function chance(probability: number): boolean {
   return Math.random() < probability;
@@ -40,19 +41,24 @@ function countJob(state: WorldState, job: Job): number {
   return count;
 }
 
-function employForJob(state: WorldState, citizen: Citizen, job: Job): void {
-  citizen.job = job;
+function employForJob(state: WorldState, citizen: Citizen, job: Job): boolean {
   if (job === "Farmer") {
     const farm = state.leastStaffedOfType("Farm");
-    state.assignWorker(citizen, farm ? farm.id : null);
-    return;
+    if (!farm) return false;
+    citizen.job = "Farmer";
+    state.assignWorker(citizen, farm.id);
+    return true;
   }
   if (job === "Merchant") {
     const market = state.leastStaffedOfType("Market");
-    state.assignWorker(citizen, market ? market.id : null);
-    return;
+    if (!market) return false;
+    citizen.job = "Merchant";
+    state.assignWorker(citizen, market.id);
+    return true;
   }
+  citizen.job = job;
   state.assignWorker(citizen, null);
+  return true;
 }
 
 export function distributeJobWorkers(state: WorldState): void {
@@ -83,20 +89,35 @@ function distributeAcross(
 
   let index = 0;
   for (const worker of workers) {
-    const building = buildings[index % buildings.length];
-    state.assignWorker(worker, building.id);
-    index += 1;
+    let placed = false;
+    for (let i = 0; i < buildings.length; i++) {
+      const building = buildings[(index + i) % buildings.length];
+      if (
+        building.capacity === 0 ||
+        building.workerIds.length < building.capacity
+      ) {
+        state.assignWorker(worker, building.id);
+        index = (index + i + 1) % buildings.length;
+        placed = true;
+        break;
+      }
+    }
+    if (!placed) {
+      worker.job = "Unemployed";
+      state.assignWorker(worker, null);
+    }
   }
 }
 
 export function produceFood(state: WorldState): number {
   let lowYieldEvents = 0;
+  let totalProduced = 0;
   for (const building of state.buildings.values()) {
     if (building.type !== "Farm" || building.workerIds.length === 0) continue;
     const base = building.workerIds.length * building.foodPerWorkerTick;
     const variation = 1 + (Math.random() * 2 - 1) * FARM_YIELD_VARIATION;
     const produced = Math.max(0, Math.round(base * variation));
-    state.resources.food += produced;
+    totalProduced += produced;
     if (produced < base && chance(0.25)) {
       state.addEvent({
         type: "FarmYieldLow",
@@ -106,6 +127,28 @@ export function produceFood(state: WorldState): number {
       lowYieldEvents += 1;
     }
   }
+
+  if (totalProduced > 0 || state.resources.food > 0) {
+    const shops = state.buildingsOfType("Market");
+    if (shops.length > 0) {
+      const existing = shops.reduce((sum, s) => sum + s.food, 0);
+      const unallocated = Math.max(0, state.resources.food - existing);
+      const pool = unallocated + totalProduced;
+      const perShop = Math.floor(pool / shops.length);
+      let remainder = pool - perShop * shops.length;
+      for (const shop of shops) {
+        shop.food += perShop;
+        if (remainder > 0) {
+          shop.food += 1;
+          remainder -= 1;
+        }
+      }
+      state.resources.food = shops.reduce((sum, s) => sum + s.food, 0);
+    } else {
+      state.resources.food += totalProduced;
+    }
+  }
+
   return lowYieldEvents;
 }
 
@@ -132,29 +175,51 @@ export function completePurchase(
   buyer: Citizen,
   price: number,
 ): Citizen | null {
-  const sellers: Citizen[] = [];
-  for (const citizen of state.citizens.values()) {
-    if (citizen.job !== "Merchant") continue;
-    const workplace = citizen.worksAtBuildingId
-      ? state.buildings.get(citizen.worksAtBuildingId)
-      : null;
-    if (workplace?.type === "Market") sellers.push(citizen);
-  }
+  const shopsWithFood = state
+    .buildingsOfType("Market")
+    .filter((shop) => shop.food > 0);
 
-  if (sellers.length === 0) {
-    state.resources.gold += price;
+  let shop: Building | null = null;
+  if (shopsWithFood.length > 0) {
+    shop = randomOf(shopsWithFood);
+    shop.food -= 1;
+    state.resources.food = Math.max(0, state.resources.food - 1);
+  } else if (state.resources.food > 0) {
+    state.resources.food -= 1;
+  } else {
     return null;
   }
 
-  const seller = randomOf(sellers);
-  seller.money += price;
-  state.addTrade({
-    buyerId: buyer.id,
-    sellerId: seller.id,
-    item: "Food",
-    price,
-    tick: state.tick,
-  });
+  let seller: Citizen | null = null;
+  if (shop) {
+    for (const citizen of state.citizens.values()) {
+      if (
+        citizen.job === "Merchant" &&
+        citizen.worksAtBuildingId === shop.id
+      ) {
+        seller = citizen;
+        break;
+      }
+    }
+  }
+
+  const tax = Math.floor(price * SHOP_FOOD_TAX_RATE);
+  const shopkeeperShare = price - tax;
+
+  if (seller) {
+    seller.money += shopkeeperShare;
+    state.resources.gold += tax;
+    state.addTrade({
+      buyerId: buyer.id,
+      sellerId: seller.id,
+      item: "Food",
+      price,
+      tick: state.tick,
+    });
+  } else {
+    state.resources.gold += price;
+  }
+
   return seller;
 }
 
@@ -166,12 +231,13 @@ export function runArrivals(state: WorldState): number {
   if (!house) return 0;
 
   const name = `${randomOf(CITIZEN_NAMES)} #${state.citizens.size + 1}`;
-  const citizen = state.addCitizen({
-    name,
-    job: randomOf(ARRIVAL_JOBS),
-  });
+  const job = randomOf(ARRIVAL_JOBS);
+  const citizen = state.addCitizen({ name, job });
   state.assignHouse(citizen, house.id);
-  employForJob(state, citizen, citizen.job);
+  if (!employForJob(state, citizen, job)) {
+    citizen.job = "Unemployed";
+    state.assignWorker(citizen, null);
+  }
 
   state.addEvent({
     type: "CitizenArrived",
@@ -179,6 +245,33 @@ export function runArrivals(state: WorldState): number {
     citizenId: citizen.id,
   });
   return 1;
+}
+
+export function runJobSeeking(state: WorldState): number {
+  let employed = 0;
+  for (const citizen of state.citizens.values()) {
+    if (citizen.job !== "Unemployed") continue;
+
+    if (employForJob(state, citizen, "Farmer")) {
+      state.addEvent({
+        type: "JobChanged",
+        message: `${citizen.name} found work as a Farmer.`,
+        citizenId: citizen.id,
+      });
+      employed += 1;
+      continue;
+    }
+
+    if (employForJob(state, citizen, "Merchant")) {
+      state.addEvent({
+        type: "JobChanged",
+        message: `${citizen.name} found work as a Shopkeeper.`,
+        citizenId: citizen.id,
+      });
+      employed += 1;
+    }
+  }
+  return employed;
 }
 
 export function runJobSwitching(state: WorldState): number {
@@ -191,13 +284,14 @@ export function runJobSwitching(state: WorldState): number {
     const candidate = pickSwitchCandidate(state, "Merchant");
     if (candidate) {
       const previous = candidate.job;
-      employForJob(state, candidate, "Merchant");
-      state.addEvent({
-        type: "JobChanged",
-        message: `${candidate.name} switched from ${previous} to Merchant.`,
-        citizenId: candidate.id,
-      });
-      return 1;
+      if (employForJob(state, candidate, "Merchant")) {
+        state.addEvent({
+          type: "JobChanged",
+          message: `${candidate.name} switched from ${previous} to Merchant.`,
+          citizenId: candidate.id,
+        });
+        return 1;
+      }
     }
   }
 
@@ -207,13 +301,14 @@ export function runJobSwitching(state: WorldState): number {
     const candidate = pickSwitchCandidate(state, "Farmer");
     if (candidate) {
       const previous = candidate.job;
-      employForJob(state, candidate, "Farmer");
-      state.addEvent({
-        type: "JobChanged",
-        message: `${candidate.name} switched from ${previous} to Farmer.`,
-        citizenId: candidate.id,
-      });
-      return 1;
+      if (employForJob(state, candidate, "Farmer")) {
+        state.addEvent({
+          type: "JobChanged",
+          message: `${candidate.name} switched from ${previous} to Farmer.`,
+          citizenId: candidate.id,
+        });
+        return 1;
+      }
     }
   }
 
