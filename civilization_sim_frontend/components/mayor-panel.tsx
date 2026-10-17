@@ -52,14 +52,14 @@ export function MayorPanel({
   return (
     <Panel title="What Should We Do?" subtitle="The mayor has an idea for you">
       <div className="space-y-3">
-        <div className="rounded-2xl border-2 border-amber-200 bg-amber-50 p-3">
+        <div className="border-2 border-[#a9832a] bg-[#e8c05a] p-3">
           {policy ? (
             <div className="space-y-2">
-              <p className="text-sm font-extrabold text-amber-900">
+              <p className="text-sm font-bold text-[#3d2c07]">
                 💡 {policyPlainReason(policy.action)}
               </p>
               {policyBenefit(policy.action) ? (
-                <p className="text-xs text-amber-700">
+                <p className="text-xs font-semibold text-[#5c460f]">
                   {policyBenefit(policy.action)}
                 </p>
               ) : null}
@@ -73,14 +73,14 @@ export function MayorPanel({
               </Button>
             </div>
           ) : (
-            <p className="text-sm font-semibold text-amber-800">
+            <p className="text-sm font-bold text-[#3d2c07]">
               The mayor is thinking… 💭
             </p>
           )}
         </div>
 
         <div>
-          <p className="mb-1.5 text-xs font-bold text-slate-500">
+          <p className="mb-1.5 text-xs font-bold text-[#2b2b2b]">
             🛠️ Build something ({gold} gold)
           </p>
           <div className="grid grid-cols-3 gap-2">
@@ -98,7 +98,7 @@ export function MayorPanel({
                 >
                   <span className="text-xl">{BUILDING_EMOJI[type]}</span>
                   <span className="text-xs">{BUILDING_LABEL[type]}</span>
-                  <span className="text-xs text-amber-600">{cost} 🪙</span>
+                  <span className="text-xs text-amber-800">{cost} 🪙</span>
                 </Button>
               );
             })}
@@ -106,22 +106,22 @@ export function MayorPanel({
         </div>
 
         <div>
-          <p className="mb-1.5 text-xs font-bold text-slate-500">
+          <p className="mb-1.5 text-xs font-bold text-[#2b2b2b]">
             📜 Past ideas
           </p>
           <ul className="space-y-1">
             {(mayor?.recentPolicies ?? []).length === 0 ? (
-              <li className="text-xs text-slate-400">Nothing yet.</li>
+              <li className="text-xs text-[#4a4f57]">Nothing yet.</li>
             ) : (
               (mayor?.recentPolicies ?? []).slice(0, 5).map((item: Policy) => (
                 <li
                   key={item.id}
-                  className="flex items-center justify-between gap-2 rounded-xl border border-slate-100 bg-slate-50 px-2.5 py-1.5"
+                  className="mc-inset flex items-center justify-between gap-2 px-2.5 py-1.5"
                 >
-                  <span className="truncate text-xs font-semibold text-slate-600">
+                  <span className="truncate text-xs font-semibold">
                     {policyPlainReason(item.action)}
                   </span>
-                  <span className="shrink-0 text-xs font-bold text-slate-500">
+                  <span className="shrink-0 text-xs font-bold">
                     {STATUS_EMOJI[item.status]} {STATUS_TEXT[item.status]}
                   </span>
                 </li>

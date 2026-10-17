@@ -1,28 +1,33 @@
-import type { ButtonHTMLAttributes } from "react";
+import type { ButtonHTMLAttributes, CSSProperties } from "react";
 
 type Variant = "primary" | "secondary" | "ghost" | "danger";
 
-const VARIANTS: Record<Variant, string> = {
-  primary:
-    "bg-emerald-500 text-white hover:bg-emerald-600 disabled:bg-slate-200 disabled:text-slate-400",
-  secondary:
-    "bg-sky-100 text-sky-800 hover:bg-sky-200 disabled:bg-slate-100 disabled:text-slate-400",
-  ghost:
-    "bg-transparent text-slate-500 hover:bg-slate-100 disabled:text-slate-300",
-  danger:
-    "bg-rose-500 text-white hover:bg-rose-600 disabled:bg-slate-200 disabled:text-slate-400",
+const VARIANTS: Record<Variant, CSSProperties> = {
+  primary: { backgroundColor: "#3f9b46", color: "#ffffff" },
+  secondary: { backgroundColor: "#c6c6c6", color: "#232323" },
+  ghost: { backgroundColor: "#b4b4b4", color: "#232323" },
+  danger: { backgroundColor: "#b3402f", color: "#ffffff" },
+};
+
+const DISABLED: CSSProperties = {
+  backgroundColor: "#b0b0b0",
+  color: "#7d7d7d",
 };
 
 export function Button({
   variant = "secondary",
   className,
+  disabled,
+  style,
   ...props
 }: ButtonHTMLAttributes<HTMLButtonElement> & { variant?: Variant }) {
   return (
     <button
-      className={`inline-flex items-center justify-center gap-1.5 rounded-xl px-3 py-2 text-sm font-bold transition-colors disabled:cursor-not-allowed ${
-        VARIANTS[variant]
-      } ${className ?? ""}`}
+      disabled={disabled}
+      style={{ ...(disabled ? DISABLED : VARIANTS[variant]), ...style }}
+      className={`mc-btn inline-flex items-center justify-center gap-1.5 px-3 py-2 text-sm font-bold ${
+        className ?? ""
+      }`}
       {...props}
     />
   );

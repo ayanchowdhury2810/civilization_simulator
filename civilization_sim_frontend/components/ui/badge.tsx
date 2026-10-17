@@ -3,12 +3,12 @@ import type { ReactNode } from "react";
 type Tone = "zinc" | "emerald" | "amber" | "rose" | "sky" | "indigo";
 
 const TONES: Record<Tone, string> = {
-  zinc: "bg-slate-100 text-slate-600 border-slate-200",
-  emerald: "bg-emerald-100 text-emerald-700 border-emerald-200",
-  amber: "bg-amber-100 text-amber-700 border-amber-200",
-  rose: "bg-rose-100 text-rose-700 border-rose-200",
-  sky: "bg-sky-100 text-sky-700 border-sky-200",
-  indigo: "bg-indigo-100 text-indigo-700 border-indigo-200",
+  zinc: "bg-[#d4d4d4] text-[#2b2b2b] border-[#5b5b5b]",
+  emerald: "bg-[#7fbf6a] text-[#12300a] border-[#3f7d2e]",
+  amber: "bg-[#e8c05a] text-[#3d2c07] border-[#a9832a]",
+  rose: "bg-[#e08a80] text-[#3d0f0a] border-[#a5382c]",
+  sky: "bg-[#8fc4e8] text-[#0c2b40] border-[#3a7ea6]",
+  indigo: "bg-[#a5a9e0] text-[#141736] border-[#4b4f9b]",
 };
 
 export function Badge({
@@ -22,7 +22,7 @@ export function Badge({
 }) {
   return (
     <span
-      className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold ${
+      className={`inline-flex items-center border-2 px-2 py-0.5 text-xs font-bold ${
         TONES[tone]
       } ${className ?? ""}`}
     >

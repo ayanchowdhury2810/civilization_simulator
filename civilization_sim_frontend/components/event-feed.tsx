@@ -39,10 +39,10 @@ export function EventFeed({
               key={item.label}
               type="button"
               onClick={() => setFilter(item.label)}
-              className={`rounded-full px-2 py-0.5 text-xs font-semibold transition-colors ${
+              className={`border-2 px-2 py-0.5 text-xs font-bold transition-colors ${
                 filter === item.label
-                  ? "bg-sky-500 text-white"
-                  : "bg-slate-100 text-slate-500 hover:bg-slate-200"
+                  ? "border-[#14161a] bg-[#3f7d2e] text-white"
+                  : "border-[#5b5b5b] bg-[#d4d4d4] text-[#2b2b2b] hover:bg-[#c6c6c6]"
               }`}
             >
               {item.label}
@@ -55,7 +55,7 @@ export function EventFeed({
     >
       <ul className="space-y-1.5">
         {filtered.length === 0 ? (
-          <li className="text-sm text-slate-400">
+          <li className="text-sm text-[#4a4f57]">
             Nothing here yet. Wait and see what happens!
           </li>
         ) : (
@@ -71,15 +71,15 @@ export function EventFeed({
                   type="button"
                   disabled={!entity}
                   onClick={() => entity && onSelect(entity)}
-                  className="flex w-full items-center gap-2 rounded-xl border border-slate-100 bg-slate-50 px-2.5 py-2 text-left transition-colors enabled:hover:border-sky-200 enabled:hover:bg-sky-50 disabled:cursor-default"
+                  className="mc-inset flex w-full items-center gap-2 px-2.5 py-2 text-left transition-[filter] enabled:hover:brightness-110 disabled:cursor-default"
                 >
                   <span className="shrink-0 text-lg">
                     {eventEmoji(event.type)}
                   </span>
-                  <span className="min-w-0 flex-1 text-sm font-medium text-slate-700">
+                  <span className="min-w-0 flex-1 text-sm font-medium">
                     {plainMessage(event.message)}
                   </span>
-                  <span className="shrink-0 rounded-full bg-white px-2 py-0.5 text-xs font-semibold text-slate-400">
+                  <span className="shrink-0 border-2 border-[#5b5b5b] bg-[#c6c6c6] px-2 py-0.5 text-xs font-bold text-[#2b2b2b]">
                     Day {event.tick}
                   </span>
                 </button>

@@ -17,18 +17,20 @@ export function Panel({
 }) {
   return (
     <section
-      className={`flex min-h-0 flex-col overflow-hidden rounded-3xl border-2 border-sky-100 bg-white shadow-sm ${
+      className={`mc-panel flex min-h-0 flex-col overflow-hidden ${
         className ?? ""
       }`}
     >
       {title ? (
-        <header className="flex items-center justify-between gap-2 border-b-2 border-sky-50 px-4 py-2.5">
+        <header className="flex items-center justify-between gap-2 border-b-2 border-[#8b8b8b] bg-[#9d9d9d] px-3 py-2">
           <div className="min-w-0">
-            <h2 className="truncate text-base font-extrabold text-slate-700">
+            <h2 className="truncate text-base font-bold text-[#16181c]">
               {title}
             </h2>
             {subtitle ? (
-              <p className="truncate text-xs text-slate-400">{subtitle}</p>
+              <p className="truncate text-xs font-medium text-[#4a4f57]">
+                {subtitle}
+              </p>
             ) : null}
           </div>
           {actions}

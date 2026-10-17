@@ -15,15 +15,15 @@ function Stat({
   bg: string;
 }) {
   return (
-    <div className={`rounded-2xl border-2 ${bg} px-3 py-2`}>
+    <div className={`border-2 ${bg} px-3 py-2`}>
       <div className="flex items-center gap-2">
         <span className="text-2xl">{emoji}</span>
         <div className="min-w-0">
-          <p className="text-xs font-semibold text-slate-500">{label}</p>
-          <p className="text-xl font-extrabold text-slate-800">{value}</p>
+          <p className="text-xs font-semibold text-[#484d55]">{label}</p>
+          <p className="text-xl font-bold text-[#16181c]">{value}</p>
         </div>
       </div>
-      {hint ? <p className="mt-1 text-xs text-slate-500">{hint}</p> : null}
+      {hint ? <p className="mt-1 text-xs text-[#484d55]">{hint}</p> : null}
     </div>
   );
 }

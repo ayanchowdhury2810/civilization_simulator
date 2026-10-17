@@ -9,10 +9,10 @@ export function BuildingCard({ building }: { building: Building }) {
       <div className="flex items-center gap-2">
         <span className="text-2xl">{BUILDING_EMOJI[building.type]}</span>
         <div>
-          <p className="text-base font-extrabold text-slate-800">
+          <p className="text-base font-bold text-[#16181c]">
             {BUILDING_LABEL[building.type]}
           </p>
-          <p className="text-xs font-semibold text-slate-500">
+          <p className="text-xs font-semibold text-[#484d55]">
             {BUILDING_HELP[building.type]}
           </p>
         </div>
@@ -20,27 +20,27 @@ export function BuildingCard({ building }: { building: Building }) {
 
       <div className="grid grid-cols-2 gap-2 text-sm">
         {isHouse ? (
-          <div className="rounded-2xl border border-slate-100 bg-slate-50 px-3 py-2">
-            <p className="text-xs font-semibold text-slate-500">
+          <div className="mc-inset px-3 py-2">
+            <p className="text-xs font-semibold text-[#484d55]">
               🏠 Space for
             </p>
-            <p className="text-lg font-extrabold text-slate-800">
+            <p className="text-lg font-bold">
               {building.capacity} people
             </p>
           </div>
         ) : (
           <>
-            <div className="rounded-2xl border border-slate-100 bg-slate-50 px-3 py-2">
-              <p className="text-xs font-semibold text-slate-500">👷 Workers</p>
-              <p className="text-lg font-extrabold text-slate-800">
+            <div className="mc-inset px-3 py-2">
+              <p className="text-xs font-semibold text-[#484d55]">👷 Workers</p>
+              <p className="text-lg font-bold">
                 {building.workerIds.length}
               </p>
             </div>
-            <div className="rounded-2xl border border-slate-100 bg-slate-50 px-3 py-2">
-              <p className="text-xs font-semibold text-slate-500">
+            <div className="mc-inset px-3 py-2">
+              <p className="text-xs font-semibold text-[#484d55]">
                 🍎 Food / worker
               </p>
-              <p className="text-lg font-extrabold text-slate-800">
+              <p className="text-lg font-bold">
                 {building.foodPerWorkerTick}
               </p>
             </div>

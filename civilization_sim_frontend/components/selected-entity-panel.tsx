@@ -37,11 +37,11 @@ function CitizenDetails({ id, tick }: { id: string; tick: number }) {
     };
   }, [id, tick]);
 
-  if (error) return <p className="text-sm text-rose-500">{error}</p>;
+  if (error) return <p className="text-sm font-bold text-[#7a1d12]">{error}</p>;
   if (loading && !citizen)
-    return <p className="text-sm text-slate-400">Loading…</p>;
+    return <p className="text-sm text-[#4a4f57]">Loading…</p>;
   if (!citizen)
-    return <p className="text-sm text-slate-400">Cannot find this person.</p>;
+    return <p className="text-sm text-[#4a4f57]">Cannot find this person.</p>;
   return <CitizenCard citizen={citizen} />;
 }
 
@@ -71,14 +71,14 @@ export function SelectedEntityPanel({
       }
     >
       {!selected ? (
-        <p className="text-sm text-slate-400">
+        <p className="text-sm text-[#4a4f57]">
           Tap a person or a building in the town to see what they are doing.
         </p>
       ) : selected.kind === "building" ? (
         building ? (
           <BuildingCard building={building} />
         ) : (
-          <p className="text-sm text-rose-500">
+          <p className="text-sm font-bold text-[#7a1d12]">
             {BUILDING_EMOJI["House"]} The building is gone.
           </p>
         )

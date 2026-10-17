@@ -26,10 +26,10 @@ export function CitizenCard({ citizen }: { citizen: CitizenDetail }) {
       <div className="flex items-center gap-2">
         <span className="text-2xl">{JOB_EMOJI[citizen.job]}</span>
         <div>
-          <p className="text-base font-extrabold text-slate-800">
+          <p className="text-base font-bold text-[#16181c]">
             {citizen.name}
           </p>
-          <p className="text-xs font-semibold text-slate-500">
+          <p className="text-xs font-semibold text-[#484d55]">
             {JOB_LABEL[citizen.job]}
           </p>
         </div>

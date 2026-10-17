@@ -72,17 +72,17 @@ export function HistorianChat() {
         className="min-h-0 flex-1 space-y-2 overflow-y-auto pr-1"
       >
         {messages.length === 0 ? (
-          <li className="text-sm text-slate-400">
+          <li className="text-sm text-[#4a4f57]">
             Curious about your town? Ask anything — like why food is expensive.
           </li>
         ) : null}
         {messages.map((message) => (
           <li
             key={message.id}
-            className={`rounded-2xl border px-3 py-2 text-sm leading-relaxed ${
+            className={`border-2 px-3 py-2 text-sm leading-relaxed ${
               message.role === "user"
-                ? "border-sky-200 bg-sky-50 text-slate-700"
-                : "border-slate-100 bg-slate-50 text-slate-700"
+                ? "border-[#3a5f80] bg-[#aac6e0] text-[#0e1c2a]"
+                : "border-[#3a3a3a] bg-[#8b8b8b] text-[#16181c]"
             }`}
           >
             {message.role === "helper" && message.source ? (
@@ -98,10 +98,10 @@ export function HistorianChat() {
           </li>
         ))}
         {loading ? (
-          <li className="text-sm text-slate-400">Thinking… 🤔</li>
+          <li className="text-sm text-[#4a4f57]">Thinking… 🤔</li>
         ) : null}
         {error ? (
-          <li className="text-sm text-rose-500">{error}</li>
+          <li className="text-sm font-bold text-[#7a1d12]">{error}</li>
         ) : null}
       </ul>
 
@@ -112,7 +112,7 @@ export function HistorianChat() {
             type="button"
             onClick={() => ask(prompt)}
             disabled={loading}
-            className="rounded-full border border-slate-200 bg-white px-2.5 py-1 text-xs font-semibold text-slate-500 transition-colors enabled:hover:border-sky-300 enabled:hover:text-sky-600 disabled:opacity-50"
+            className="mc-btn px-2.5 py-1 text-xs font-bold disabled:opacity-60"
           >
             {prompt}
           </button>
@@ -131,7 +131,7 @@ export function HistorianChat() {
           onChange={(event) => setInput(event.target.value)}
           placeholder="Ask a question…"
           maxLength={500}
-          className="min-w-0 flex-1 rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 outline-none placeholder:text-slate-400 focus:border-sky-400"
+          className="mc-inset min-w-0 flex-1 px-3 py-2 text-sm outline-none placeholder:text-[#4a4f57]"
         />
         <Button type="submit" variant="primary" disabled={loading}>
           Ask

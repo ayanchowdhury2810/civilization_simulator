@@ -78,25 +78,25 @@ export function Dashboard() {
 
   return (
     <div className="mx-auto flex w-full max-w-[1500px] flex-col gap-3 p-3 lg:p-4">
-      <header className="flex flex-wrap items-center justify-between gap-3 rounded-3xl border-2 border-sky-100 bg-white px-4 py-3 shadow-sm">
+      <header className="mc-panel flex flex-wrap items-center justify-between gap-3 px-4 py-3">
         <div>
-          <h1 className="text-xl font-extrabold text-slate-800">
+          <h1 className="text-xl font-bold text-[#16181c]">
             🏰 My Little Town
           </h1>
-          <p className="text-sm text-slate-500">
+          <p className="text-sm font-medium text-[#4a4f57]">
             You are the King! Help your people grow and stay happy.
           </p>
         </div>
         <div className="flex items-center gap-3">
-          <span className="inline-flex items-center gap-1.5 text-sm font-semibold text-slate-500">
+          <span className="inline-flex items-center gap-1.5 text-sm font-bold text-[#2b2b2b]">
             <span
-              className={`h-2.5 w-2.5 rounded-full ${
-                connected ? "bg-emerald-400" : "bg-rose-400"
+              className={`h-2.5 w-2.5 border border-black/40 ${
+                connected ? "bg-emerald-500" : "bg-rose-500"
               }`}
             />
             {connected ? "Live" : "Offline"}
           </span>
-          <Button variant="ghost" onClick={() => void refresh()}>
+          <Button variant="secondary" onClick={() => void refresh()}>
             Refresh 🔄
           </Button>
         </div>
@@ -104,10 +104,10 @@ export function Dashboard() {
 
       {notice ? (
         <div
-          className={`rounded-2xl border-2 px-3 py-2 text-sm font-semibold ${
+          className={`border-2 px-3 py-2 text-sm font-bold ${
             notice.tone === "success"
-              ? "border-emerald-200 bg-emerald-50 text-emerald-700"
-              : "border-rose-200 bg-rose-50 text-rose-600"
+              ? "border-[#3f7d2e] bg-[#a7d98f] text-[#12300a]"
+              : "border-[#a5382c] bg-[#eaa79e] text-[#3d0f0a]"
           }`}
         >
           {notice.text}
@@ -115,7 +115,7 @@ export function Dashboard() {
       ) : null}
 
       {error ? (
-        <div className="rounded-2xl border-2 border-rose-200 bg-rose-50 px-3 py-2 text-sm font-semibold text-rose-600">
+        <div className="border-2 border-[#a5382c] bg-[#eaa79e] px-3 py-2 text-sm font-bold text-[#3d0f0a]">
           {error}
         </div>
       ) : null}
