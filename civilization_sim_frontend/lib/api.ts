@@ -10,6 +10,7 @@ import type {
 } from "./types";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3001";
+const GENERIC_ERROR_MESSAGE = "An unexpected error occurred. Please try again.";
 
 interface ApiSuccess<T> {
   success: true;
@@ -40,10 +41,7 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
       ...init,
     });
   } catch {
-    throw new ApiError(
-      `Cannot reach the civilization backend at ${API_URL}. Is it running?`,
-      "NETWORK_ERROR",
-    );
+    throw new ApiError(GENERIC_ERROR_MESSAGE, "NETWORK_ERROR");
   }
 
   const body = (await response.json().catch(() => null)) as
@@ -55,7 +53,7 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
     const message =
       body && body.success === false
         ? body.error.message
-        : `Request failed (${response.status})`;
+        : GENERIC_ERROR_MESSAGE;
     const code =
       body && body.success === false ? body.error.code : "REQUEST_FAILED";
     throw new ApiError(message, code);

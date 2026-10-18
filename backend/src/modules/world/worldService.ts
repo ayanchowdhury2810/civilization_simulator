@@ -33,8 +33,8 @@ export function ensureWorldSeeded(): void {
 export async function syncWorldToGraph(): Promise<boolean> {
   const synced = await trySyncWorld();
   if (!synced) {
-    console.warn(
-      "[world] FalkorDB sync failed — simulation continues in memory only",
+    console.error(
+      "[world] FalkorDB sync failed — persistence unavailable",
     );
   }
   return synced;

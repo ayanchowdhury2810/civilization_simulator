@@ -3,6 +3,8 @@ import { env } from "../config/env.js";
 import { BaseAppError } from "../error/baseAppError.js";
 import type { ApiFailure } from "../common/utils/apiResponse.js";
 
+const GENERIC_ERROR_MESSAGE = "An unexpected error occurred. Please try again.";
+
 export function errorMiddleware(
   err: unknown,
   _req: Request,
@@ -12,7 +14,7 @@ export function errorMiddleware(
   if (err instanceof BaseAppError) {
     const body: ApiFailure = {
       success: false,
-      error: { message: err.message, code: err.code },
+      error: { message: GENERIC_ERROR_MESSAGE, code: err.code },
     };
     res.status(err.statusCode).json(body);
     return;
@@ -22,11 +24,9 @@ export function errorMiddleware(
     console.error("[unhandled error]", err);
   }
 
-  const message =
-    err instanceof Error ? err.message : "Internal server error";
   const body: ApiFailure = {
     success: false,
-    error: { message, code: "INTERNAL_ERROR" },
+    error: { message: GENERIC_ERROR_MESSAGE, code: "INTERNAL_ERROR" },
   };
   res.status(500).json(body);
 }

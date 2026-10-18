@@ -27,17 +27,18 @@ async function bootstrap(): Promise<void> {
     pingFalkorDB(),
     new Promise<false>((resolve) => setTimeout(() => resolve(false), 3000)),
   ]);
-  if (dbUp) {
-    const restored = await loadWorldFromGraph();
-    if (restored) {
-      console.log("[world] restored previous world state from FalkorDB");
-    } else {
-      await syncWorldToGraph();
-    }
-  } else {
-    console.warn(
-      `[startup] FalkorDB unreachable at ${env.FALKORDB_HOST}:${env.FALKORDB_PORT} — running in memory only`,
+  if (!dbUp) {
+    console.error(
+      `[startup] FalkorDB unreachable at ${env.FALKORDB_HOST}:${env.FALKORDB_PORT}. Start FalkorDB before running server.`,
     );
+    process.exit(1);
+  }
+
+  const restored = await loadWorldFromGraph();
+  if (restored) {
+    console.log("[world] restored previous world state from FalkorDB");
+  } else {
+    await syncWorldToGraph();
   }
 
   if (env.AUTO_TICK) {
