@@ -81,7 +81,7 @@ export function Dashboard() {
       <header className="mc-panel flex flex-wrap items-center justify-between gap-3 px-4 py-3">
         <div>
           <h1 className="text-xl font-bold text-[#16181c]">
-            🏰 My Little Town
+            🏰 Civilization simulator
           </h1>
           <p className="text-sm font-medium text-[#4a4f57]">
             You are the King! Help your people grow and stay happy.

@@ -1,6 +1,6 @@
-# My Little Town — Graph-Powered Civilization Simulator
+# Civilization simulator — Graph-Powered Town Simulation
 
-My Little Town is a small, self-running civilization simulator. You play as
+Civilization simulator is a small, self-running town simulation. You play as
 the King: build houses, farms, and markets; review the Mayor's suggestions; and
 ask the Historian why things happened in the town.
 

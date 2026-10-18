@@ -14,7 +14,7 @@ const pixelNum = Silkscreen({
 });
 
 export const metadata: Metadata = {
-  title: "My Little Town",
+  title: "Civilization simulator",
   description:
     "A friendly little town that grows. Help your people by building farms, houses and shops.",
 };
