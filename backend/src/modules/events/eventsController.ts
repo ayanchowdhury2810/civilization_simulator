@@ -7,5 +7,5 @@ export const listEvents = asyncHandler(async (req, res) => {
   const parsed = Number(rawLimit ?? 50);
   const limit =
     Number.isFinite(parsed) && parsed > 0 ? Math.min(parsed, 200) : 50;
-  apiResponse(res, 200, getRecentEvents(limit));
+  apiResponse(res, 200, await getRecentEvents(limit));
 });

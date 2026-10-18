@@ -103,6 +103,9 @@ export function extractNodeProperties(
 
 function formatParamValue(value: unknown): string {
   if (value === null || value === undefined) return "null";
+  if (Array.isArray(value)) {
+    return `[${value.map((item) => formatParamValue(item)).join(", ")}]`;
+  }
   if (typeof value === "number" || typeof value === "boolean") {
     return String(value);
   }

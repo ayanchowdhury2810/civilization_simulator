@@ -50,6 +50,21 @@ export async function syncWorldState(state: WorldState): Promise<void> {
 
   await graphQuery(
     graph,
+    `MATCH (c:Citizen)
+     WHERE NOT (c.id IN $ids)
+     DETACH DELETE c`,
+    { ids: [...state.citizens.keys()] },
+  );
+  await graphQuery(
+    graph,
+    `MATCH (b:Building)
+     WHERE NOT (b.id IN $ids)
+     DETACH DELETE b`,
+    { ids: [...state.buildings.keys()] },
+  );
+
+  await graphQuery(
+    graph,
     `MERGE (m:Mayor {id: $mayorId}) SET m.role = "AI Mayor"`,
     { mayorId: MAYOR_ID },
   );
@@ -80,6 +95,11 @@ export async function syncWorldState(state: WorldState): Promise<void> {
       demand: state.market.demand,
       lastTickAt: state.lastTickAt ?? "",
     },
+  );
+
+  await graphQuery(
+    graph,
+    `MATCH (:Citizen)-[r:LIVES_IN|WORKS_AT]->(:Building) DELETE r`,
   );
 
   for (const citizen of state.citizens.values()) {

@@ -1,13 +1,11 @@
 import { runTick, type TickResult } from "../../simulation/tickEngine.js";
-import { worldState } from "../../simulation/worldState.js";
-import { trySyncWorld } from "../world/worldService.js";
+import { updateWorldState } from "../world/worldService.js";
 
 export async function runSingleTick(): Promise<
   TickResult & { graphSynced: boolean }
 > {
-  const result = runTick(worldState);
-  const graphSynced = await trySyncWorld();
-  return { ...result, graphSynced };
+  const result = await updateWorldState((state) => runTick(state));
+  return { ...result, graphSynced: true };
 }
 
 let loopHandle: NodeJS.Timeout | null = null;

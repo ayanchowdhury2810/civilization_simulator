@@ -2,9 +2,7 @@ import { app } from "./app.js";
 import { env } from "./config/env.js";
 import { closeFalkorDB, pingFalkorDB } from "./config/falkordb.js";
 import {
-  ensureWorldSeeded,
-  loadWorldFromGraph,
-  syncWorldToGraph,
+  initializeWorldInGraph,
 } from "./modules/world/worldService.js";
 import {
   startTickLoop,
@@ -17,8 +15,6 @@ import {
 } from "./modules/mayor/mayorService.js";
 
 async function bootstrap(): Promise<void> {
-  ensureWorldSeeded();
-
   const server = app.listen(env.PORT, () => {
     console.log(`[server] listening on http://localhost:${env.PORT}`);
   });
@@ -34,18 +30,14 @@ async function bootstrap(): Promise<void> {
     process.exit(1);
   }
 
-  const restored = await loadWorldFromGraph();
-  if (restored) {
-    console.log("[world] restored previous world state from FalkorDB");
-  } else {
-    await syncWorldToGraph();
-  }
+  await initializeWorldInGraph();
+  console.log("[world] FalkorDB is the source of truth");
 
   if (env.AUTO_TICK) {
     startTickLoop(env.TICK_INTERVAL_MS);
   }
 
-  evaluateMayor();
+  await evaluateMayor();
   if (env.AUTO_MAYOR) {
     startMayorLoop(env.MAYOR_INTERVAL_MS);
   }

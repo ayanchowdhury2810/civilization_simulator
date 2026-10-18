@@ -1,6 +1,7 @@
-import { worldState } from "../../simulation/worldState.js";
 import type { SimEvent } from "../../simulation/types.js";
+import { loadWorldStateFromGraph } from "../world/worldService.js";
 
-export function getRecentEvents(limit: number): SimEvent[] {
-  return worldState.recentEvents(limit);
+export async function getRecentEvents(limit: number): Promise<SimEvent[]> {
+  const state = await loadWorldStateFromGraph();
+  return state.recentEvents(limit);
 }

@@ -100,6 +100,29 @@ export interface MayorView {
   loopRunning: boolean;
 }
 
+export interface MayorInvestigation {
+  recommendationId: string;
+  generatedAt: string;
+  status: "complete" | "partial" | "unavailable";
+  finding: { key: string; title: string; summary: string };
+  recommendation: { action: "build_farm" | "build_house" | "no_action"; title: string; rationale: string };
+  evidence: Array<{
+    id: string;
+    kind: "metric" | "event" | "relationship" | "entity";
+    label: string;
+    detail: string;
+    timestamp?: string;
+    sourceNodeIds?: string[];
+    relationshipType?: string;
+    provenance: "falkordb_record" | "world_state" | "rule_inference";
+    interpretation: "supports" | "contradicts" | "context";
+  }>;
+  connectedEntities: Array<{ id: string; type: string; label: string }>;
+  reasoning: string[];
+  limitations: string[];
+  evidenceQuality: { level: "strong" | "moderate" | "limited" | "none"; explanation: string };
+}
+
 export interface ApprovalResult {
   policy: Policy;
   building: Building | null;

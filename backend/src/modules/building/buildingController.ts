@@ -15,5 +15,5 @@ export const buildBuilding = asyncHandler(async (req, res) => {
 });
 
 export const listBuildings = asyncHandler(async (_req, res) => {
-  apiResponse(res, 200, getBuildings());
+  apiResponse(res, 200, await getBuildings());
 });

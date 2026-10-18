@@ -89,7 +89,6 @@ export class WorldState {
     this.events = [...data.events];
     this.trades = [...data.trades];
     this.policies = [...data.policies];
-    this.resources.population = this.citizens.size;
     this.currentPolicy =
       [...this.policies].reverse().find((policy) => policy.status === "pending") ??
       null;
@@ -326,5 +325,3 @@ export class WorldState {
       building && building.type === "House" ? buildingId : null;
   }
 }
-
-export const worldState = new WorldState();

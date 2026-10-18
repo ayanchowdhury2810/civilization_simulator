@@ -77,7 +77,7 @@ export function Dashboard() {
   );
 
   return (
-    <div className="flex w-full flex-col lg:h-[100dvh]">
+    <div className="flex min-h-screen w-full flex-col">
       <header className="mc-panel flex flex-wrap items-center justify-between gap-3 px-4 py-3">
         <div>
           <h1 className="text-xl font-bold text-[#16181c]">
@@ -120,8 +120,8 @@ export function Dashboard() {
         </div>
       ) : null}
 
-      <div className="grid min-h-0 flex-1 gap-3 p-3 lg:grid-cols-[300px_minmax(0,1fr)_340px] lg:overflow-hidden">
-        <div className="flex min-h-0 flex-col gap-3 lg:overflow-y-auto">
+      <div className="grid gap-3 p-3 lg:grid-cols-[300px_minmax(0,1fr)_340px]">
+        <div className="flex flex-col gap-3">
           <ResourcePanel world={world} />
           <MayorPanel
             mayor={mayor}
@@ -132,11 +132,11 @@ export function Dashboard() {
           />
         </div>
 
-        <div className="flex min-h-0 flex-col">
+        <div className="flex flex-col">
           <WorldMap world={world} selected={selected} onSelect={setSelected} />
         </div>
 
-        <div className="flex min-h-0 flex-col gap-3 lg:overflow-y-auto">
+        <div className="flex flex-col gap-3">
           <HistorianChat />
           <EventFeed events={events} onSelect={setSelected} />
           <SelectedEntityPanel

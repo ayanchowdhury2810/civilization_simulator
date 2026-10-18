@@ -5,6 +5,7 @@ import type {
   ChatAnswer,
   CitizenDetail,
   MayorView,
+  MayorInvestigation,
   SimEvent,
   WorldSnapshot,
 } from "./types";
@@ -66,6 +67,7 @@ export const api = {
   getWorld: () => request<WorldSnapshot>("/api/world"),
   getEvents: (limit = 50) => request<SimEvent[]>(`/api/events?limit=${limit}`),
   getMayor: () => request<MayorView>("/api/mayor"),
+  getMayorInvestigation: () => request<MayorInvestigation>("/api/mayor/investigation"),
   approvePolicy: (policyId?: string) =>
     request<ApprovalResult>("/api/mayor/approve", {
       method: "POST",

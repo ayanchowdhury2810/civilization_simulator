@@ -1,5 +1,4 @@
 import { isLlmConfigured, generateText } from "../../common/llm/gemini.js";
-import { worldState } from "../../simulation/worldState.js";
 import {
   fetchCauseChains,
   fetchCitizenPlaces,
@@ -42,7 +41,7 @@ export interface CitizenPlaceSummary {
 }
 
 export interface RetrievedContext {
-  origin: "graph" | "memory";
+  origin: "graph";
   tick: number;
   food: number;
   gold: number;
@@ -156,22 +155,12 @@ export async function answerQuestion(question: string): Promise<ChatAnswer> {
 }
 
 async function retrieveContext(question: string): Promise<RetrievedContext> {
-  try {
-    const fromGraph = await retrieveFromGraph(question);
-    if (fromGraph) return fromGraph;
-  } catch (error) {
-    console.warn(
-      `[chat] graph retrieval failed, using in-memory fallback: ${
-        error instanceof Error ? error.message : String(error)
-      }`,
-    );
-  }
-  return retrieveFromMemory(question);
+  return retrieveFromGraph(question);
 }
 
 async function retrieveFromGraph(
   question: string,
-): Promise<RetrievedContext | null> {
+): Promise<RetrievedContext> {
   const [world, events, chains, trades, stats, places] = await Promise.all([
     fetchWorldNode(),
     fetchRecentEvents(80),
@@ -180,8 +169,6 @@ async function retrieveFromGraph(
     fetchCitizenStats(),
     fetchCitizenPlaces(200),
   ]);
-
-  if (!world && events.length === 0) return null;
 
   const eventList: RetrievedEvent[] = events.map((event) => ({
     id: event.id,
@@ -195,7 +182,7 @@ async function retrieveFromGraph(
     tick: world?.tick ?? 0,
     food: world?.food ?? 0,
     gold: world?.gold ?? 0,
-    population: world?.population ?? stats?.population ?? 0,
+    population: stats?.population ?? world?.population ?? 0,
     foodPrice: world?.foodPrice ?? 0,
     demand: world?.demand ?? 0,
     stats: {
@@ -232,71 +219,6 @@ async function retrieveFromGraph(
   };
 }
 
-function retrieveFromMemory(question: string): RetrievedContext {
-  const events: RetrievedEvent[] = [...worldState.events]
-    .reverse()
-    .map((event) => ({
-      id: event.id,
-      type: event.type,
-      message: event.message,
-      tick: event.tick,
-    }));
-
-  const causeChains: CauseChain[] = [];
-  for (const event of worldState.events) {
-    if (!event.causedByEventId) continue;
-    const cause = worldState.getEventById(event.causedByEventId);
-    if (!cause) continue;
-    causeChains.push({
-      causeType: cause.type,
-      causeMessage: cause.message,
-      effectType: event.type,
-      effectMessage: event.message,
-      tick: event.tick,
-    });
-  }
-  causeChains.reverse();
-
-  return {
-    origin: "memory",
-    tick: worldState.tick,
-    food: worldState.resources.food,
-    gold: worldState.resources.gold,
-    population: worldState.resources.population,
-    foodPrice: worldState.market.foodPrice,
-    demand: worldState.market.demand,
-    stats: summarizeCitizens(),
-    events: filterEvents(events, matchTopics(question)),
-    causeChains,
-    trades: worldState.recentTrades(25).map((trade) => ({
-      buyer: worldState.citizens.get(trade.buyerId)?.name ?? trade.buyerId,
-      seller: worldState.citizens.get(trade.sellerId)?.name ?? trade.sellerId,
-      item: trade.item,
-      count: 1,
-      lastPrice: trade.price,
-      tick: trade.tick,
-    })),
-    places: selectPlaces(
-      [...worldState.citizens.values()].map((citizen) => {
-        const home = citizen.livesInBuildingId
-          ? worldState.buildings.get(citizen.livesInBuildingId)
-          : null;
-        const work = citizen.worksAtBuildingId
-          ? worldState.buildings.get(citizen.worksAtBuildingId)
-          : null;
-        return {
-          id: citizen.id,
-          name: citizen.name,
-          job: citizen.job,
-          home: home ? placeLabel(home.id, home.type) : null,
-          work: work ? placeLabel(work.id, work.type) : null,
-        };
-      }),
-      question,
-    ),
-  };
-}
-
 function placeLabel(id: string | null, type: string | null): string | null {
   if (!id || !type) return null;
   const match = id.match(/_(\d+)$/);
@@ -317,26 +239,6 @@ function selectPlaces(
   return matched.length > 0 ? matched.slice(0, 40) : places.slice(0, 25);
 }
 
-function summarizeCitizens(): RetrievedContext["stats"] {
-  const citizens = [...worldState.citizens.values()];
-  const population = citizens.length;
-  if (population === 0) {
-    return { population, avgHappiness: 0, avgFoodLevel: 0 };
-  }
-  const happinessTotal = citizens.reduce(
-    (total, citizen) => total + citizen.happiness,
-    0,
-  );
-  const foodLevelTotal = citizens.reduce(
-    (total, citizen) => total + citizen.foodLevel,
-    0,
-  );
-  return {
-    population,
-    avgHappiness: Math.round(happinessTotal / population),
-    avgFoodLevel: Math.round(foodLevelTotal / population),
-  };
-}
 
 function matchTopics(question: string): string[] {
   const query = question.toLowerCase();

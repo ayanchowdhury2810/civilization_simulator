@@ -41,6 +41,9 @@ export function useCivilization(pollMs = 2500): CivilizationState {
     } catch (err) {
       setConnected(false);
       setError(err instanceof Error ? err.message : "Unknown error");
+      setWorld(null);
+      setEvents([]);
+      setMayor(null);
     } finally {
       inFlight.current = false;
     }
