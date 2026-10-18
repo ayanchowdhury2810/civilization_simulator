@@ -64,7 +64,9 @@ for the schema, Cypher patterns, and algorithms.
 Relationships include `LIVES_IN`, `WORKS_AT`, `TRADED_WITH`, `INVOLVED_IN`,
 `CAUSED`, `CREATED`, `TRIGGERED_BY`, `APPROVED`, `BUILT`, and
 `HAS_BUILDING`. See the graph reference for the direction and use of each
-relationship.
+relationship. For a quick visual view of citizen-connected graph data in
+FalkorDB Browser, use the inspection query in
+[GRAPH_QUERIES_AND_ALGORITHMS.md](GRAPH_QUERIES_AND_ALGORITHMS.md).
 
 ## Requirements
 

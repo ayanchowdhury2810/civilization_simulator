@@ -62,6 +62,22 @@ parameter prefix before sending `GRAPH.QUERY`. In FalkorDB Browser, replace
 the parameters with literal values or use FalkorDB's supported `CYPHER`
 parameter form.
 
+### Visualize citizen-connected graph data
+
+To view citizen nodes, their directly connected nodes, and the relationships
+between them in FalkorDB Browser, run:
+
+~~~cypher
+MATCH (u:Citizen)-[r]-(related)
+RETURN u, r, related
+LIMIT 5000
+~~~
+
+The undirected pattern follows relationships in either direction. The result
+is limited to records connected directly to a Citizen; isolated nodes and
+parts of the graph with no citizen connection are not included. LIMIT 5000
+caps the number of matched rows returned.
+
 ## Core Cypher query patterns
 
 ### 1. Read the world summary
