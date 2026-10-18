@@ -88,3 +88,11 @@ body {
   border-radius: 0;
   color: #14161a;
 }
+
+/* Readable pixel digits — Silkscreen has clearer 2/8/5/6 than Pixelify Sans */
+.mc-num {
+  font-family: var(--font-pixel-num), var(--font-pixel), ui-monospace, monospace;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.06em;
+  font-weight: 700;
+}

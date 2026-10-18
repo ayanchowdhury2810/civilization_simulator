@@ -19,7 +19,7 @@ export function Meter({
     <div className="space-y-1">
       <div className="flex items-center justify-between text-xs font-bold text-[#2b2b2b]">
         <span>{label}</span>
-        <span>
+        <span className="mc-num">
           {Math.round(value)}
           {suffix ?? ""}
         </span>

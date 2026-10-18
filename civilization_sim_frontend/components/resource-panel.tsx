@@ -20,7 +20,7 @@ function Stat({
         <span className="text-2xl">{emoji}</span>
         <div className="min-w-0">
           <p className="text-xs font-semibold text-[#484d55]">{label}</p>
-          <p className="text-xl font-bold text-[#16181c]">{value}</p>
+          <p className="mc-num text-xl text-[#16181c]">{value}</p>
         </div>
       </div>
       {hint ? <p className="mt-1 text-xs text-[#484d55]">{hint}</p> : null}
@@ -47,7 +47,18 @@ export function ResourcePanel({ world }: { world: WorldSnapshot | null }) {
     : undefined;
 
   return (
-    <Panel title="Your Town" subtitle={world ? `Day ${world.tick}` : "Loading…"}>
+    <Panel
+      title="Your Town"
+      subtitle={
+        world ? (
+          <span>
+            Day <span className="mc-num">{world.tick}</span>
+          </span>
+        ) : (
+          "Loading…"
+        )
+      }
+    >
       <div className="grid grid-cols-2 gap-2">
         <Stat
           emoji="🍎"

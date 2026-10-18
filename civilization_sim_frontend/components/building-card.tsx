@@ -76,7 +76,7 @@ export function BuildingCard({
             <p className="text-xs font-semibold text-[#484d55]">
               🏠 Space for
             </p>
-            <p className="text-lg font-bold">
+            <p className="mc-num text-lg font-bold">
               {building.capacity} people
             </p>
           </div>
@@ -84,7 +84,7 @@ export function BuildingCard({
           <>
             <div className="mc-inset px-3 py-2">
               <p className="text-xs font-semibold text-[#484d55]">👷 Workers</p>
-              <p className="text-lg font-bold">
+              <p className="mc-num text-lg font-bold">
                 {building.workerIds.length}
                 {building.capacity > 0 ? ` / ${building.capacity}` : ""}
               </p>
@@ -94,7 +94,7 @@ export function BuildingCard({
                 <p className="text-xs font-semibold text-[#484d55]">
                   🍎 Food / worker
                 </p>
-                <p className="text-lg font-bold">
+                <p className="mc-num text-lg font-bold">
                   {building.foodPerWorkerTick}
                 </p>
               </div>
@@ -103,7 +103,7 @@ export function BuildingCard({
                 <p className="text-xs font-semibold text-[#484d55]">
                   🍎 Food in stock
                 </p>
-                <p className="text-lg font-bold">{building.food}</p>
+                <p className="mc-num text-lg font-bold">{building.food}</p>
               </div>
             )}
           </>

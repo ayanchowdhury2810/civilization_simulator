@@ -1,10 +1,16 @@
 import type { Metadata } from "next";
-import { Pixelify_Sans } from "next/font/google";
+import { Pixelify_Sans, Silkscreen } from "next/font/google";
 import "./globals.css";
 
 const pixel = Pixelify_Sans({
   variable: "--font-pixel",
   subsets: ["latin"],
+});
+
+const pixelNum = Silkscreen({
+  variable: "--font-pixel-num",
+  subsets: ["latin"],
+  weight: ["400", "700"],
 });
 
 export const metadata: Metadata = {
@@ -17,7 +23,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en"
-      className={`${pixel.variable} h-full antialiased`}
+      className={`${pixel.variable} ${pixelNum.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">{children}</body>
     </html>

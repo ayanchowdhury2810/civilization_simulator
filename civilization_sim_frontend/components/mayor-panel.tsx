@@ -81,7 +81,7 @@ export function MayorPanel({
 
         <div>
           <p className="mb-1.5 text-xs font-bold text-[#2b2b2b]">
-            🛠️ Build something ({gold} gold)
+            🛠️ Build something (<span className="mc-num">{gold}</span> gold)
           </p>
           <div className="grid grid-cols-3 gap-2">
             {BUILD_TYPES.map((type) => {
@@ -98,7 +98,7 @@ export function MayorPanel({
                 >
                   <span className="text-xl">{BUILDING_EMOJI[type]}</span>
                   <span className="text-xs">{BUILDING_LABEL[type]}</span>
-                  <span className="text-xs text-amber-800">{cost} 🪙</span>
+                  <span className="mc-num text-xs text-amber-800">{cost} 🪙</span>
                 </Button>
               );
             })}

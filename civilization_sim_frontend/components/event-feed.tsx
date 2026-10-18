@@ -79,7 +79,7 @@ export function EventFeed({
                   <span className="min-w-0 flex-1 text-sm font-medium">
                     {plainMessage(event.message)}
                   </span>
-                  <span className="shrink-0 border-2 border-[#5b5b5b] bg-[#c6c6c6] px-2 py-0.5 text-xs font-bold text-[#2b2b2b]">
+                  <span className="mc-num shrink-0 border-2 border-[#5b5b5b] bg-[#c6c6c6] px-2 py-0.5 text-xs font-bold text-[#2b2b2b]">
                     Day {event.tick}
                   </span>
                 </button>
