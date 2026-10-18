@@ -143,6 +143,7 @@ export function Dashboard() {
             selected={selected}
             world={world}
             onClear={() => setSelected(null)}
+            onSelect={setSelected}
           />
         </div>
       </div>

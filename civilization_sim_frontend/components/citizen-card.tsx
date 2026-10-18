@@ -20,6 +20,14 @@ function buildingIcon(type: string | undefined): string {
   return BUILDING_EMOJI[type as BuildingType] ?? "🏠";
 }
 
+function buildingPlace(building: { id: string; type: string } | null): string {
+  if (!building) return "";
+  const match = building.id.match(/_(\d+)$/);
+  return match
+    ? `${buildingName(building.type)} ${match[1]}`
+    : `${buildingName(building.type)} ${building.id}`;
+}
+
 export function CitizenCard({ citizen }: { citizen: CitizenDetail }) {
   return (
     <div className="space-y-3">
@@ -50,16 +58,16 @@ export function CitizenCard({ citizen }: { citizen: CitizenDetail }) {
         ) : null}
         {citizen.livesIn ? (
           <Badge tone="indigo">
-            {buildingIcon(citizen.livesIn.type)} Lives in a{" "}
-            {buildingName(citizen.livesIn.type)}
+            {buildingIcon(citizen.livesIn.type)} Lives in{" "}
+            {buildingPlace(citizen.livesIn)}
           </Badge>
         ) : (
           <Badge tone="rose">🏚️ No home</Badge>
         )}
         {citizen.worksAt ? (
           <Badge tone="emerald">
-            {buildingIcon(citizen.worksAt.type)} Works at a{" "}
-            {buildingName(citizen.worksAt.type)}
+            {buildingIcon(citizen.worksAt.type)} Works at{" "}
+            {buildingPlace(citizen.worksAt)}
           </Badge>
         ) : (
           <Badge tone="zinc">🚶 No job place</Badge>

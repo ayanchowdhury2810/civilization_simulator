@@ -49,10 +49,12 @@ export function SelectedEntityPanel({
   selected,
   world,
   onClear,
+  onSelect,
 }: {
   selected: SelectedEntity;
   world: WorldSnapshot | null;
   onClear: () => void;
+  onSelect: (entity: SelectedEntity) => void;
 }) {
   const building =
     selected?.kind === "building"
@@ -76,7 +78,13 @@ export function SelectedEntityPanel({
         </p>
       ) : selected.kind === "building" ? (
         building ? (
-          <BuildingCard building={building} />
+          <BuildingCard
+            building={building}
+            citizens={world?.citizens ?? []}
+            onSelectCitizen={(citizen) =>
+              onSelect({ kind: "citizen", id: citizen.id })
+            }
+          />
         ) : (
           <p className="text-sm font-bold text-[#7a1d12]">
             {BUILDING_EMOJI["House"]} The building is gone.

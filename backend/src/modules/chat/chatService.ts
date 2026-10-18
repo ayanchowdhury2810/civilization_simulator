@@ -2,6 +2,7 @@ import { isLlmConfigured, generateText } from "../../common/llm/gemini.js";
 import { worldState } from "../../simulation/worldState.js";
 import {
   fetchCauseChains,
+  fetchCitizenPlaces,
   fetchCitizenStats,
   fetchRecentEvents,
   fetchRecentTrades,
@@ -32,6 +33,14 @@ export interface TradeSummary {
   tick: number;
 }
 
+export interface CitizenPlaceSummary {
+  id: string;
+  name: string;
+  job: string;
+  home: string | null;
+  work: string | null;
+}
+
 export interface RetrievedContext {
   origin: "graph" | "memory";
   tick: number;
@@ -44,6 +53,7 @@ export interface RetrievedContext {
   events: RetrievedEvent[];
   causeChains: CauseChain[];
   trades: TradeSummary[];
+  places: CitizenPlaceSummary[];
 }
 
 export interface ChatAnswer {
@@ -113,6 +123,7 @@ const SYSTEM_PROMPT = [
   "Explain cause and effect chains where relevant, for example:",
   "food shortage -> higher prices -> hungry citizens -> lower happiness.",
   "Cite concrete event types, citizen and building ids, tick numbers, and trade relationships from the context.",
+  "The context lists citizens with where they live (LIVES_IN) and work (WORKS_AT); use it to answer questions about a person's home or workplace.",
   "If the context does not contain enough information, say so plainly.",
   "Keep the answer under 150 words.",
 ].join(" ");
@@ -161,12 +172,13 @@ async function retrieveContext(question: string): Promise<RetrievedContext> {
 async function retrieveFromGraph(
   question: string,
 ): Promise<RetrievedContext | null> {
-  const [world, events, chains, trades, stats] = await Promise.all([
+  const [world, events, chains, trades, stats, places] = await Promise.all([
     fetchWorldNode(),
     fetchRecentEvents(80),
     fetchCauseChains(40),
     fetchRecentTrades(25),
     fetchCitizenStats(),
+    fetchCitizenPlaces(200),
   ]);
 
   if (!world && events.length === 0) return null;
@@ -207,6 +219,16 @@ async function retrieveFromGraph(
       lastPrice: trade.lastPrice,
       tick: trade.lastTick,
     })),
+    places: selectPlaces(
+      places.map((place) => ({
+        id: place.id,
+        name: place.name,
+        job: place.job,
+        home: placeLabel(place.homeId, place.homeType),
+        work: placeLabel(place.workId, place.workType),
+      })),
+      question,
+    ),
   };
 }
 
@@ -254,7 +276,45 @@ function retrieveFromMemory(question: string): RetrievedContext {
       lastPrice: trade.price,
       tick: trade.tick,
     })),
+    places: selectPlaces(
+      [...worldState.citizens.values()].map((citizen) => {
+        const home = citizen.livesInBuildingId
+          ? worldState.buildings.get(citizen.livesInBuildingId)
+          : null;
+        const work = citizen.worksAtBuildingId
+          ? worldState.buildings.get(citizen.worksAtBuildingId)
+          : null;
+        return {
+          id: citizen.id,
+          name: citizen.name,
+          job: citizen.job,
+          home: home ? placeLabel(home.id, home.type) : null,
+          work: work ? placeLabel(work.id, work.type) : null,
+        };
+      }),
+      question,
+    ),
   };
+}
+
+function placeLabel(id: string | null, type: string | null): string | null {
+  if (!id || !type) return null;
+  const match = id.match(/_(\d+)$/);
+  return match ? `${type} ${match[1]}` : `${type} ${id}`;
+}
+
+function selectPlaces(
+  places: CitizenPlaceSummary[],
+  question: string,
+): CitizenPlaceSummary[] {
+  const query = question.toLowerCase();
+  const matched = places.filter((place) => {
+    const name = place.name.toLowerCase();
+    if (query.includes(name)) return true;
+    const first = name.split(/\s+/)[0];
+    return first.length > 2 && query.includes(first);
+  });
+  return matched.length > 0 ? matched.slice(0, 40) : places.slice(0, 25);
 }
 
 function summarizeCitizens(): RetrievedContext["stats"] {
@@ -337,6 +397,14 @@ function buildContextText(context: RetrievedContext): string {
     );
   }
 
+  lines.push("Citizens and where they live or work:");
+  if (context.places.length === 0) lines.push("- none");
+  for (const place of context.places) {
+    lines.push(
+      `- ${place.name} (${place.job}, id ${place.id}): lives in ${place.home ?? "no home"}, works at ${place.work ?? "no workplace"}`,
+    );
+  }
+
   return lines.join("\n");
 }
 
@@ -373,6 +441,14 @@ function buildFallbackAnswer(context: RetrievedContext): string {
     lines.push(
       `Recent trade: ${trade.buyer} bought ${trade.item} from ${trade.seller} ` +
         `for ${trade.lastPrice} gold (tick ${trade.tick}).`,
+    );
+  }
+
+  if (context.places.length > 0) {
+    const place = context.places[0];
+    lines.push(
+      `${place.name} lives in ${place.home ?? "no home"} and works at ` +
+        `${place.work ?? "no workplace"}.`,
     );
   }
 

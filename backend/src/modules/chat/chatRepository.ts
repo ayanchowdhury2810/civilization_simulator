@@ -44,6 +44,16 @@ export interface GraphCitizenStats {
   avgFoodLevel: number;
 }
 
+export interface GraphCitizenPlace {
+  id: string;
+  name: string;
+  job: string;
+  homeId: string | null;
+  homeType: string | null;
+  workId: string | null;
+  workType: string | null;
+}
+
 export async function fetchWorldNode(): Promise<GraphWorldRow | null> {
   const { rows } = await graphQuery(
     env.FALKORDB_GRAPH,
@@ -142,6 +152,29 @@ export async function fetchCitizenStats(): Promise<GraphCitizenStats | null> {
     avgHappiness: toNumber(row[1]),
     avgFoodLevel: toNumber(row[2]),
   };
+}
+
+export async function fetchCitizenPlaces(
+  limit: number,
+): Promise<GraphCitizenPlace[]> {
+  const { rows } = await graphQuery(
+    env.FALKORDB_GRAPH,
+    `MATCH (c:Citizen)
+     OPTIONAL MATCH (c)-[:LIVES_IN]->(home:Building)
+     OPTIONAL MATCH (c)-[:WORKS_AT]->(work:Building)
+     RETURN c.id, c.name, c.job, home.id, home.type, work.id, work.type
+     LIMIT $limit`,
+    { limit },
+  );
+  return rows.map((row) => ({
+    id: toText(row[0]),
+    name: toText(row[1]),
+    job: toText(row[2]),
+    homeId: row[3] == null ? null : String(row[3]),
+    homeType: row[4] == null ? null : String(row[4]),
+    workId: row[5] == null ? null : String(row[5]),
+    workType: row[6] == null ? null : String(row[6]),
+  }));
 }
 
 function toNumber(value: unknown): number {
